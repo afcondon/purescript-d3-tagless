@@ -1,0 +1,18 @@
+{
+  "name": "purescript-D3-HOAS",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^2.1.0",
+    "purescript-console": "^2.0.0",
+    "purescript-colors": "^2.1.0",
+    "purescript-dom": "^3.3.1"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^2.0.0"
+  }
+}
