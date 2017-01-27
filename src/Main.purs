@@ -5,6 +5,7 @@ import Control.Apply (applySecond)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, logShow)
 import Prelude (Unit, ($))
+import TaglessD3.Base (D3ElementType(..))
 
 infixl 4 applySecond as ..
 
@@ -18,9 +19,9 @@ d3Script2 :: ∀ m. (Selection m) => m Unit
 d3Script2 = d3Select "quux"
 
 d3Script' :: ∀ m. (Selection m) => m Unit
-d3Script' = d3Select "foo"
-         .. select "bar"
-         .. selectAll "baz"
+d3Script' = d3Select "div"
+         .. enter
+         .. append (SvgText "some text")
 
 main :: forall e. Eff (console :: CONSOLE | e) Unit
 main = do

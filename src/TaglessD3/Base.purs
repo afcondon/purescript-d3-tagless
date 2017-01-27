@@ -2,7 +2,7 @@ module TaglessD3.Base where
 
 import Color (Color)
 import DOM.Event.Types (Event)
-import Prelude (class Show)
+import Prelude (class Show, (<>))
 
 -- ||               Core foreign imports
 -- the Effect of D3
@@ -31,7 +31,7 @@ data D3ElementType
         -- | SvgPolygon
         -- | SvgPolyline
         | SvgRect
-        | SvgText
+        | SvgText String
         -- | SvgUse
 
 instance showD3ElementType :: Show D3ElementType where
@@ -40,7 +40,7 @@ instance showD3ElementType :: Show D3ElementType where
   show SvgImage  = "Image"
   show SvgPath   = "Path"
   show SvgRect   = "Rect"
-  show SvgText   = "Text"
+  show (SvgText t) = "Text: " <> t
 
 data Callback d b =   Lambda1 (d ->                                  b)
                     | Lambda2 (d -> Number ->                        b)
