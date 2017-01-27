@@ -1,12 +1,15 @@
 module TaglessD3.Selection where
 
-import D3HOAS.Base (Attr, D3ElementType, D3Transition, Selector)
+import TaglessD3.Base (Attr, D3ElementType, D3Transition, Selector)
 import Data.Array (cons)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, append, map, show, unit, ($), (<$>), (<<<), (<>))
 
 data D3Structure = D3S String (Array String)
+
+initD3S :: String -> D3Structure
+initD3S name = D3S name []
 
 instance showD3Structure :: Show D3Structure where
   show (D3S name d3s) = "Selection: " <> name <> "\n\t"<> show d3s

@@ -6,10 +6,10 @@ import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import TaglessD3.Selection --(class Selection, D3Structure(..), FakeSelection(..), d3Select, run, run')
 
 myD3Structure :: D3Structure
-myD3Structure = D3S "Awn" []
+myD3Structure = initD3S "Awn"
 
 myD3Structure2 :: D3Structure
-myD3Structure2 = D3S "Bel" []
+myD3Structure2 = initD3S "Bel"
 
 d3Script2 :: ∀ m. (Selection m) => m Unit
 d3Script2 = d3Select "quux"
