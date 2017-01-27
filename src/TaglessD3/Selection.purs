@@ -1,4 +1,4 @@
-module D3HOAS.Selection where
+module TaglessD3.Selection where
 
 import D3HOAS.Base (Attr, D3ElementType, D3Transition, Selector)
 import Data.Array (cons)

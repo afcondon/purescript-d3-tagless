@@ -1,4 +1,4 @@
-module D3HOAS.Base where
+module TaglessD3.Base where
 
 import Color (Color)
 import DOM.Event.Types (Event)

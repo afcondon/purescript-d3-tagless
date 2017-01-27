@@ -3,7 +3,7 @@ module Main where
 import Prelude (Unit, bind, pure, ($))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
-import D3HOAS.Selection --(class Selection, D3Structure(..), FakeSelection(..), d3Select, run, run')
+import TaglessD3.Selection --(class Selection, D3Structure(..), FakeSelection(..), d3Select, run, run')
 
 myD3Structure :: D3Structure
 myD3Structure = D3S "Awn" []
