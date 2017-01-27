@@ -3,7 +3,7 @@ module TaglessD3.Selection where
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
-import TaglessD3.Base (Attr, D3ElementType, Selector)
+import TaglessD3.Base (Attr, D3ElementType, Selector, renderArrayOfAttributes)
 
 data D3Structure = D3S String (Array String)
 
@@ -73,8 +73,7 @@ instance selectionDummySelection :: Selection FakeSelection where
     attrs attributes     = FakeSelection $ attrs' attributes
 
 attrs' :: ∀ d. Array (Attr d) -> D3Structure -> Tuple Unit D3Structure
-attrs' as (D3S name statements) = Tuple unit (D3S name $ statements <> ["[attributes would go here]"])
-
+attrs' as (D3S name statements) = Tuple unit (D3S name $ statements <> [ "Attributes: \n\t", renderArrayOfAttributes as ])
 
 d3Select' :: Selector -> D3Structure -> Tuple Unit D3Structure
 d3Select' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3Select", selector])

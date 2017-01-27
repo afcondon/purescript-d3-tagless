@@ -2,7 +2,7 @@ module TaglessD3.Base where
 
 import Color (Color)
 import DOM.Event.Types (Event)
-import Prelude (class Show, (<>))
+import Prelude (class Show, show, (<>))
 
 -- ||               Core foreign imports
 -- the Effect of D3
@@ -49,8 +49,15 @@ data Callback d b =   Lambda1 (d ->                                  b)
 data ValueOrCallback d b =  V b
                           | F (Callback d b)
 
-type SVGPathString = String -- could validate this here at least with runtime constructor
+instance showValueOrCallback :: (Show b) => Show (ValueOrCallback d b) where
+  show (V b) = show b
+  show (F _) = "Callback"
 
+-- static evaluation of SVGPathString could be done in dummy interpreter or,
+-- more ambitiously it could be built up using further DSL mechanics
+type SVGPathString = String
+
+-- ideally all of this attribute guff would be tagless as well
 data Attr d  = CX                  (ValueOrCallback d Number)  -- circles only
              | CY                  (ValueOrCallback d Number)  -- circles only
              | R                   (ValueOrCallback d Number)  -- circles only
@@ -77,3 +84,34 @@ data Attr d  = CX                  (ValueOrCallback d Number)  -- circles only
              | Transform    String  -- would be nice to build this up from ADT too
              | EventHandlerS Event (Callback d String) -- click | mouseenter | mouseleave | mouseover
              | EventHandlerN Event (Callback d Number)
+
+renderArrayOfAttributes :: ∀ d. Array (Attr d) -> String
+renderArrayOfAttributes attrs = "[" <> show attrs <> "]"
+
+instance showAttr :: Show (Attr d) where
+    show (CX vcb)            = "CX: " <> show vcb
+    show (CY vcb)            = "CY: " <> show vcb
+    show (R vcb)             = "R: " <> show vcb
+    show (X vcb)             = "X: " <> show vcb
+    show (Y vcb)             = "Y: " <> show vcb
+    show (DX vcb)            = "DX: " <> show vcb
+    show (DY vcb)            = "DY: " <> show vcb
+    show (Height vcb)        = "Height: " <> show vcb
+    show (Width vcb)         = "Width: " <> show vcb
+    show (StrokeWidth vcb)   = "StrokeWidth: " <> show vcb
+    show (StrokeOpacity vcb) = "StrokeOpacity: " <> show vcb
+    show (FillOpacity vcb)   = "FillOpacity: " <> show vcb
+    show (Opacity vcb)       = "Opacity: " <> show vcb
+    show (D vcb)             = "D: " <> show vcb
+    show (Id vcb)            = "Id: " <> show vcb
+    show (StrokeLineCap vcb) = "StrokeLineCap: " <> show vcb
+    show (PatternUnits vcb)  = "PatternUnits: "  <> show vcb
+    show (Style s vcb)       = "Style: " <> s <> ": " <> show vcb
+    show (Class vcb)         = "Class: " <> show vcb
+    show (Text vcb)          = "Text: " <> show vcb
+    show (Type vcb)          = "Type: " <> show vcb
+    show (Fill vcb)          = "Fill: " <> show vcb
+    show (Stroke vcb)        = "Stroke: " <> show vcb
+    show (Transform s)       = "Transform: " <> s
+    show (EventHandlerS _ _) = "EventHandlerS: "
+    show (EventHandlerN _ _) = "EventHandlerN: "
