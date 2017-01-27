@@ -1,10 +1,9 @@
 module TaglessD3.Selection where
 
-import TaglessD3.Base (Attr, D3ElementType, D3Transition, Selector)
-import Data.Array (cons)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, append, map, show, unit, ($), (<$>), (<<<), (<>))
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
+import TaglessD3.Base (D3ElementType, Selector)
 
 data D3Structure = D3S String (Array String)
 
@@ -47,11 +46,11 @@ class (Monad m) <= Selection m where
     select      :: Selector -> m Unit
     selectAll   :: Selector -> m Unit
     merge       :: m Unit -> m Unit
-    -- insert      :: D3ElementType -> m String
-    -- append      :: D3ElementType -> m String
-    -- remove      :: Unit
-    -- enter       :: m Unit
-    -- exit        :: m Unit
+    insert      :: D3ElementType -> m Unit
+    append      :: D3ElementType -> m Unit
+    remove      :: m Unit
+    enter       :: m Unit
+    exit        :: m Unit
     -- transition  :: D3Transition -> m Unit
     -- attrs       :: ∀ d. Array (Attr d) -> m Unit -> m Unit
     -- dataA       :: ∀ d. Array d -> repr -> repr
@@ -66,20 +65,42 @@ instance selectionDummySelection :: Selection FakeSelection where
     select selector      = FakeSelection $ select' selector
     selectAll selector   = FakeSelection $ selectAll' selector
     merge selection      = FakeSelection $ merge' selection
+    insert element       = FakeSelection $ insert' element
+    append element       = FakeSelection $ append' element
+    remove               = FakeSelection $ remove'
+    enter                = FakeSelection $ enter'
+    exit                 = FakeSelection $ exit'
 
 
-d3Select' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+d3Select' :: Selector -> D3Structure -> Tuple Unit D3Structure
 d3Select' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3Select", selector])
 
-d3SelectAll' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+d3SelectAll' :: Selector -> D3Structure -> Tuple Unit D3Structure
 d3SelectAll' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3SelectAll", selector])
 
-select' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+select' :: Selector -> D3Structure -> Tuple Unit D3Structure
 select' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["select", selector])
 
-selectAll' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+selectAll' :: Selector -> D3Structure -> Tuple Unit D3Structure
 selectAll' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["selectAll", selector])
 
--- the selection being merged is added to our selection
+insert' :: D3ElementType -> D3Structure -> Tuple Unit D3Structure
+insert' element (D3S name statements) = Tuple unit (D3S name $ statements <> [ show element ])
+
+append' :: D3ElementType -> D3Structure -> Tuple Unit D3Structure
+append' element (D3S name statements) = Tuple unit (D3S name $ statements <> [ show element ])
+
+remove' :: D3Structure -> Tuple Unit D3Structure
+remove' (D3S name statements) = Tuple unit (D3S name $ statements <> ["Remove"])
+
+enter' :: D3Structure -> Tuple Unit D3Structure
+enter' (D3S name statements) = Tuple unit (D3S name $ statements <> ["Enter"])
+
+exit' :: D3Structure -> Tuple Unit D3Structure
+exit' (D3S name statements) = Tuple unit (D3S name $ statements <> ["Exit"])
+
+-- the selection being merged is added to our selection, but don't yet
+-- understand how to capture name from merged selection? maybe change f to
+-- different function?
 merge' :: FakeSelection Unit -> D3Structure -> (Tuple Unit D3Structure)
 merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3Merge", "how do we capture the merging selection's name here???"])
