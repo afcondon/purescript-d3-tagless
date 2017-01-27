@@ -16,6 +16,9 @@ data FakeSelection a = FakeSelection (D3Structure -> Tuple a D3Structure)
 run :: ∀ a. FakeSelection a -> D3Structure -> a
 run (FakeSelection f) = fst <<< f
 
+run' :: ∀ a. FakeSelection a -> D3Structure -> D3Structure
+run' (FakeSelection f) = snd <<< f
+
 instance functorFakeSelection :: Functor FakeSelection where
   map f (FakeSelection g) = FakeSelection $ first f <<< g
 
