@@ -3,6 +3,7 @@
 Applying the "finally tagless, partially evaluated" style to a D3 eDSL
 
 See README for my other repo https://github.com/afcondon/purescript-d3v4 for background on D3 in Purescript
+
 See README for this repo https://github.com/afcondon/purescript-finally-tagless-ex for references on
 finally tagless DSLs in Purescript
 
