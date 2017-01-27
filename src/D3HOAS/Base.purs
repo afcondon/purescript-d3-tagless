@@ -1,6 +1,5 @@
 module D3HOAS.Base where
 
-import Prelude (Unit)
 import Color (Color)
 import DOM.Event.Types (Event)
 
