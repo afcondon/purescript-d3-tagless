@@ -20,6 +20,14 @@ data Duration = Seconds Int | MS Int
 data D3Transition = SimpleTransition Duration
                   | NamedTransition String Duration
 
+instance showDuration :: Show Duration where
+    show (Seconds i) = show i  <> "s"
+    show (MS ms)     = show ms <> "ms"
+
+instance showD3Transition :: Show D3Transition where
+  show (SimpleTransition t)     = "Duration: " <> show t
+  show (NamedTransition name t) = "Name: " <> name <> " Duration: " <> show t
+
 data D3ElementType
     =     SvgCircle
         -- | SvgEllipse

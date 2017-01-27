@@ -5,7 +5,7 @@ import Control.Apply (applySecond)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, logShow)
 import Prelude (Unit, ($))
-import TaglessD3.Base (Attr(..), D3ElementType(..), ValueOrCallback(..))
+import TaglessD3.Base (Attr(..), D3ElementType(..), D3Transition(..), Duration(..), ValueOrCallback(..))
 
 infixl 4 applySecond as ..
 
@@ -25,6 +25,7 @@ d3Script' = d3Select "div"
          .. enter
          .. append (SvgText "Loren ipsum...")
          .. attrs [ CX (V 2.0) ]
+         .. transition (NamedTransition "t1" (MS 500))
 
 main :: forall e. Eff (console :: CONSOLE | e) Unit
 main = do
