@@ -6,10 +6,10 @@ import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, append, map, show, unit, ($), (<$>), (<<<), (<>))
 
-data D3Structure = D3S (Array String)
+data D3Structure = D3S String (Array String)
 
 instance showD3Structure :: Show D3Structure where
-  show (D3S d3s) = show d3s
+  show (D3S name d3s) = "Selection: " <> name <> "\n\t"<> show d3s
 
 data FakeSelection a = FakeSelection (D3Structure -> Tuple a D3Structure)
 
@@ -40,9 +40,9 @@ instance monadFakeSelection :: Monad FakeSelection
 
 class (Monad m) <= Selection m where
     d3Select    :: Selector -> m Unit -- starts out as Unit but becomes foreign type (ie actual d3 selection)
-    -- d3SelectAll :: Selector -> m String
-    -- select      :: Selector -> m String
-    -- selectAll   :: Selector -> m String
+    d3SelectAll :: Selector -> m Unit
+    select      :: Selector -> m Unit
+    selectAll   :: Selector -> m Unit
     merge       :: m Unit -> m Unit
     -- insert      :: D3ElementType -> m String
     -- append      :: D3ElementType -> m String
@@ -59,15 +59,24 @@ class (Monad m) <= Selection m where
 
 instance selectionDummySelection :: Selection FakeSelection where
     d3Select selector    = FakeSelection $ d3Select' selector
-    -- d3SelectAll selector = FakeSelection $ "d3SelectAll: " <> selector
-    -- select selector      = FakeSelection $ s <> " Select: " <> selector
-    -- selectAll selector   = FakeSelection $ s <> " Select: All" <> selector
+    d3SelectAll selector = FakeSelection $ d3SelectAll' selector
+    select selector      = FakeSelection $ select' selector
+    selectAll selector   = FakeSelection $ selectAll' selector
     merge selection      = FakeSelection $ merge' selection
 
 
 d3Select' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
-d3Select' selector (D3S statements) = Tuple unit (D3S $ statements <> ["D3Select", selector])
+d3Select' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3Select", selector])
+
+d3SelectAll' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+d3SelectAll' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3SelectAll", selector])
+
+select' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+select' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["select", selector])
+
+selectAll' :: Selector -> D3Structure -> (Tuple Unit D3Structure)
+selectAll' selector (D3S name statements) = Tuple unit (D3S name $ statements <> ["selectAll", selector])
 
 -- the selection being merged is added to our selection
 merge' :: FakeSelection Unit -> D3Structure -> (Tuple Unit D3Structure)
-merge' (FakeSelection f) (D3S statements) = Tuple unit (D3S $ statements <> ["D3Merge", "how do we capture the merging selection's name here???"])
+merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3Merge", "how do we capture the merging selection's name here???"])
