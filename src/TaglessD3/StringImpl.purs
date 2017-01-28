@@ -6,7 +6,7 @@ import Prelude (class Applicative, class Apply, class Bind, class Functor, class
 import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector, renderArrayOfAttributes)
 import TaglessD3.Selection (class Selection)
 
-data D3Structure = D3S String (Array String)
+data D3Structure = D3S String (Array (Array String))
 
 -- initial instance not law-abiding (name' will disappear) but revise to keep
 -- list of named selections for merges TODO
@@ -113,11 +113,11 @@ exit' d3s = Tuple unit $ d3s ++ ["Exit"]
 -- understand how to capture name from merged selection? maybe change f to
 -- different function?
 merge' :: FakeSelection Unit -> D3Structure -> (Tuple Unit D3Structure)
-merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> ["D3Merge", "how do we capture the merging selection's name here???"])
+merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
 
 
 -- | Utility functions
 addD3Statement :: D3Structure -> Array String -> D3Structure
-addD3Statement (D3S name statements) statements' = D3S name $ statements <> statements'
+addD3Statement (D3S name statements) statements' = D3S name $ statements <> [statements']
 
 infixl 4 addD3Statement as ++
