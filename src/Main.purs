@@ -1,31 +1,27 @@
 module Main where
 
-import TaglessD3.Selection (class Selection, append, attrs, d3Select, dataA, enter, transition)
-import TaglessD3.StringImpl (D3Structure, initD3S, run')
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, logShow)
-import Prelude (Unit, ($))
+import Control.Monad.Eff.Console (CONSOLE, log, logShow)
+import Data.Monoid (mempty)
+import Prelude (Unit, ($), bind)
 import TaglessD3.Base (Attr(..), D3ElementType(..), D3Transition(..), Duration(..), ValueOrCallback(..), (..))
-
-myD3Structure :: D3Structure
-myD3Structure = initD3S "Awn"
-
-myD3Structure2 :: D3Structure
-myD3Structure2 = initD3S "Bel"
-
-
+import TaglessD3.DOMImpl (run', D3DOMStructure(..)) as D
+import TaglessD3.Selection (class Selection, append, attrs, d3Select, dataA, enter, transition)
+import TaglessD3.StringImpl (run') as S
 
 d3Script2 :: ∀ m. (Selection m) => m Unit
 d3Script2 = d3Select "quux"
 
 d3Script' :: ∀ m. (Selection m) => m Unit
-d3Script' = d3Select "div"
+d3Script' = d3Select "#chart"
          .. dataA [1,2,3,4,5]
          .. enter
-         .. append (SvgText "Loren ipsum...")
-         .. attrs [ CX (V 2.0) ]
+         .. append SvgText
+         .. attrs [ CX (V 2.0)] -- , CY (V "45px") ]
          .. transition (NamedTransition "t1" (MS 500))
 
 main :: forall e. Eff (console :: CONSOLE | e) Unit
 main = do
-  logShow $ run' d3Script' myD3Structure
+    logShow $ S.run' d3Script' mempty
+    log "\n\n\ncool beans\n\n\n"
+    logShow $ D.run' d3Script' (D.D3S "dom")

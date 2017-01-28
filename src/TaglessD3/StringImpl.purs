@@ -1,5 +1,6 @@
 module TaglessD3.StringImpl where
 
+import Data.Monoid (class Monoid, mempty)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
@@ -10,11 +11,11 @@ data D3Structure = D3S String (Array (Array String))
 
 -- initial instance not law-abiding (name' will disappear) but revise to keep
 -- list of named selections for merges TODO
-instance semigroupD3Structure :: Semigroup  D3Structure where
+instance semigroupD3Structure :: Semigroup D3Structure where
     append (D3S name statements) (D3S name' statements') = D3S name (statements <> statements')
 
-initD3S :: String -> D3Structure
-initD3S name = D3S name []
+instance monoidD3Structure :: Monoid D3Structure where
+    mempty = D3S "" []
 
 instance showD3Structure :: Show D3Structure where
   show (D3S name d3s) = "Selection: " <> name <> "\n\t"<> show d3s
@@ -64,24 +65,6 @@ instance selectionDummySelection :: Selection FakeSelection where
     dataAI ds index      = FakeSelection $ dataAI' ds index
     dataHI hd index      = FakeSelection $ dataHI' hd index
 
-dataA' :: ∀ d. Array d -> D3Structure -> Tuple (Array d) D3Structure
-dataA' ds d3s = Tuple ds $ d3s ++ ["Data from Array"]
-
-dataH' :: ∀ d. Hierarchy d -> D3Structure -> Tuple (Hierarchy d) D3Structure
-dataH' hd d3s = Tuple hd $ d3s ++ ["Hierarchical data"]
-
-dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple (Array d) D3Structure
-dataAI' ds index d3s = Tuple ds $ d3s ++ ["Data from Array with index function"]
-
-dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3Structure -> Tuple (Hierarchy d) D3Structure
-dataHI' hd index d3s = Tuple hd $ d3s ++ ["Hierarchical data with index function"]
-
-transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
-transition' t d3s = Tuple unit $ d3s ++ [ show t ]
-
-attrs' :: ∀ d. Array (Attr d) -> D3Structure -> Tuple Unit D3Structure
-attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: \n\t", renderArrayOfAttributes as ]
-
 d3Select' :: Selector -> D3Structure -> Tuple Unit D3Structure
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
 
@@ -95,10 +78,10 @@ selectAll' :: Selector -> D3Structure -> Tuple Unit D3Structure
 selectAll' selector d3s = Tuple unit $ d3s ++ ["selectAll", selector]
 
 insert' :: D3ElementType -> D3Structure -> Tuple Unit D3Structure
-insert' element d3s = Tuple unit $ d3s ++ [ show element ]
+insert' element d3s = Tuple unit $ d3s ++ [ "insert", show element ]
 
 append' :: D3ElementType -> D3Structure -> Tuple Unit D3Structure
-append' element d3s = Tuple unit $ d3s ++ [ show element ]
+append' element d3s = Tuple unit $ d3s ++ [ "append", show element ]
 
 remove' :: D3Structure -> Tuple Unit D3Structure
 remove' d3s = Tuple unit $ d3s ++ ["Remove"]
@@ -108,6 +91,24 @@ enter' d3s = Tuple unit $ d3s ++ ["Enter"]
 
 exit' :: D3Structure -> Tuple Unit D3Structure
 exit' d3s = Tuple unit $ d3s ++ ["Exit"]
+
+attrs' :: ∀ d. Array (Attr d) -> D3Structure -> Tuple Unit D3Structure
+attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", renderArrayOfAttributes as ]
+
+transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
+transition' t d3s = Tuple unit $ d3s ++ [ show t ]
+
+dataA' :: ∀ d. Array d -> D3Structure -> Tuple (Array d) D3Structure
+dataA' ds d3s = Tuple ds $ d3s ++ ["Data from Array"]
+
+dataH' :: ∀ d. Hierarchy d -> D3Structure -> Tuple (Hierarchy d) D3Structure
+dataH' hd d3s = Tuple hd $ d3s ++ ["Hierarchical data"]
+
+dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple (Array d) D3Structure
+dataAI' ds index d3s = Tuple ds $ d3s ++ ["Data from Array with index function"]
+
+dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3Structure -> Tuple (Hierarchy d) D3Structure
+dataHI' hd index d3s = Tuple hd $ d3s ++ ["Hierarchical data with index function"]
 
 -- the selection being merged is added to our selection, but don't yet
 -- understand how to capture name from merged selection? maybe change f to
