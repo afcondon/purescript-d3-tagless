@@ -1,6 +1,7 @@
 module Main where
 
-import TaglessD3.Selection
+import TaglessD3.Selection (class Selection, append, attrs, d3Select, dataA, enter, transition)
+import TaglessD3.StringImpl (D3Structure, initD3S, run')
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, logShow)
 import Prelude (Unit, ($))
