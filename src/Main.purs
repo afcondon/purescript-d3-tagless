@@ -9,9 +9,6 @@ import TaglessD3.DOMImpl (run', D3DOMStructure(..)) as D
 import TaglessD3.Selection (class Selection, append, attrs, d3Select, dataA, enter, transition)
 import TaglessD3.StringImpl (run') as S
 
-d3Script2 :: ∀ m. (Selection m) => m Unit
-d3Script2 = d3Select "quux"
-
 d3Script' :: ∀ m. (Selection m) => m Unit
 d3Script' = d3Select "#chart"
          .. dataA [1,2,3,4,5]
