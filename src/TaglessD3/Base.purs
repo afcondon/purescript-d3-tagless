@@ -2,7 +2,9 @@ module TaglessD3.Base where
 
 import Color (Color)
 import DOM.Event.Types (Event)
+import Data.Newtype (class Newtype)
 import Prelude (class Show, show, (<>))
+import Control.Apply (applySecond)
 
 -- ||               Core foreign imports
 -- the Effect of D3
@@ -14,19 +16,19 @@ foreign import data Peers       :: *
 -- the `this` pointer in a callback, DOM element receiving an event
 foreign import data DomElement  :: *
 
+-- can be used to provide closer match to the JavaScript D3 syntax if desired
+infixl 4 applySecond as ..
+
 type Selector = String
 
 data Duration = Seconds Int | MS Int
+
 data D3Transition = SimpleTransition Duration
                   | NamedTransition String Duration
 
-instance showDuration :: Show Duration where
-    show (Seconds i) = show i  <> "s"
-    show (MS ms)     = show ms <> "ms"
+newtype Hierarchy d = Hierarchy { name :: String, children :: Array (Hierarchy d), datum :: d }
 
-instance showD3Transition :: Show D3Transition where
-  show (SimpleTransition t)     = "Duration: " <> show t
-  show (NamedTransition name t) = "Name: " <> name <> " Duration: " <> show t
+derive instance newtypeHierarchy :: Newtype (Hierarchy d) _
 
 data D3ElementType
     =     SvgCircle
@@ -42,13 +44,6 @@ data D3ElementType
         | SvgText String
         -- | SvgUse
 
-instance showD3ElementType :: Show D3ElementType where
-  show SvgCircle = "Circle"
-  show SvgGroup  = "Group"
-  show SvgImage  = "Image"
-  show SvgPath   = "Path"
-  show SvgRect   = "Rect"
-  show (SvgText t) = "Text: " <> t
 
 data Callback d b =   Lambda1 (d ->                                  b)
                     | Lambda2 (d -> Number ->                        b)
@@ -57,9 +52,6 @@ data Callback d b =   Lambda1 (d ->                                  b)
 data ValueOrCallback d b =  V b
                           | F (Callback d b)
 
-instance showValueOrCallback :: (Show b) => Show (ValueOrCallback d b) where
-  show (V b) = show b
-  show (F _) = "Callback"
 
 -- static evaluation of SVGPathString could be done in dummy interpreter or,
 -- more ambitiously it could be built up using further DSL mechanics
@@ -95,6 +87,26 @@ data Attr d  = CX                  (ValueOrCallback d Number)  -- circles only
 
 renderArrayOfAttributes :: ∀ d. Array (Attr d) -> String
 renderArrayOfAttributes attrs = "[" <> show attrs <> "]"
+
+instance showDuration :: Show Duration where
+    show (Seconds i) = show i  <> "s"
+    show (MS ms)     = show ms <> "ms"
+
+instance showD3Transition :: Show D3Transition where
+  show (SimpleTransition t)     = "Duration: " <> show t
+  show (NamedTransition name t) = "Name: " <> name <> " Duration: " <> show t
+
+instance showD3ElementType :: Show D3ElementType where
+  show SvgCircle = "Circle"
+  show SvgGroup  = "Group"
+  show SvgImage  = "Image"
+  show SvgPath   = "Path"
+  show SvgRect   = "Rect"
+  show (SvgText t) = "Text: " <> t
+
+instance showValueOrCallback :: (Show b) => Show (ValueOrCallback d b) where
+  show (V b) = show b
+  show (F _) = "Callback"
 
 instance showAttr :: Show (Attr d) where
     show (CX vcb)            = "CX: " <> show vcb

@@ -3,7 +3,7 @@ module TaglessD3.Selection where
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
-import TaglessD3.Base (Attr, D3ElementType, D3Transition, Selector, renderArrayOfAttributes)
+import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector, renderArrayOfAttributes)
 
 data D3Structure = D3S String (Array String)
 
@@ -53,10 +53,10 @@ class (Monad m) <= Selection m where
     exit        :: m Unit
     transition  :: D3Transition -> m Unit
     attrs       :: ∀ d. Array (Attr d) -> m Unit
-    -- dataA       :: ∀ d. Array d -> repr -> repr
-    -- dataH       :: ∀ d. Array d -> repr -> repr
-    -- dataAI      :: ∀ d i. Array d -> (d -> i) -> repr -> repr
-    -- dataHI      :: ∀ d i. Array d -> (d -> i) -> repr -> repr
+    dataA       :: ∀ d. Array d -> m (Array d)
+    dataH       :: ∀ d. Hierarchy d -> m (Hierarchy d)
+    dataAI      :: ∀ d i. Array d -> (d -> i) -> m (Array d)
+    dataHI      :: ∀ d i. Hierarchy d -> (d -> i) -> m (Hierarchy d)
 
 
 instance selectionDummySelection :: Selection FakeSelection where
@@ -72,6 +72,22 @@ instance selectionDummySelection :: Selection FakeSelection where
     exit                 = FakeSelection $ exit'
     attrs attributes     = FakeSelection $ attrs' attributes
     transition t         = FakeSelection $ transition' t
+    dataA ds             = FakeSelection $ dataA' ds
+    dataH hd             = FakeSelection $ dataH' hd
+    dataAI ds index      = FakeSelection $ dataAI' ds index
+    dataHI hd index      = FakeSelection $ dataHI' hd index
+
+dataA' :: ∀ d. Array d -> D3Structure -> Tuple (Array d) D3Structure
+dataA' ds (D3S name statements) = Tuple ds (D3S name $ statements <> ["Data from Array"])
+
+dataH' :: ∀ d. Hierarchy d -> D3Structure -> Tuple (Hierarchy d) D3Structure
+dataH' hd (D3S name statements) = Tuple hd (D3S name $ statements <> ["Hierarchical data"])
+
+dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple (Array d) D3Structure
+dataAI' ds index (D3S name statements) = Tuple ds (D3S name $ statements <> ["Data from Array with index function"])
+
+dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3Structure -> Tuple (Hierarchy d) D3Structure
+dataHI' hd index (D3S name statements) = Tuple hd (D3S name $ statements <> ["Hierarchical data with index function"])
 
 transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
 transition' t (D3S name statements) = Tuple unit (D3S name $ statements <> [ show t ])
