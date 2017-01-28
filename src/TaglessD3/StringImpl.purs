@@ -5,7 +5,7 @@ import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
 import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector, renderArrayOfAttributes)
-import TaglessD3.Selection (class Selection)
+import TaglessD3.Selection (class AbstractSelection)
 
 data D3Structure = D3S String (Array (Array String))
 
@@ -47,7 +47,7 @@ d3StructureFn (FakeSelection f) = f
 
 instance monadFakeSelection :: Monad FakeSelection
 
-instance selectionDummySelection :: Selection FakeSelection where
+instance selectionDummySelection :: AbstractSelection FakeSelection where
     d3Select selector    = FakeSelection $ d3Select' selector
     d3SelectAll selector = FakeSelection $ d3SelectAll' selector
     select selector      = FakeSelection $ select' selector

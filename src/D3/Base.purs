@@ -2,6 +2,9 @@ module D3.Base
   ( module Control.Monad.Eff
   , D3
   , D3Element
+  , D3Selection
+  , Peers
+  , DomElement
   , D3Typenames
   , ListenerType(..)
   , Typenames(..)
@@ -14,29 +17,29 @@ module D3.Base
   , PolyValue(..)
   , Index
   , Nodes
-  , (..)
-  , (...)
   , PredicateFn
   , PredicateB
   , PredicateS
   , PredicateN
   , transparent
   , opaque
-  , theHorror
   ) where
 
 import Control.Monad.Eff (Eff)
 import Data.Array ((:))
 import Data.Foldable (foldr, intercalate)
-import Data.Foreign.Null (writeNull)
-import Data.Function (applyFlipped)
 import Data.Maybe (Maybe(Nothing, Just))
-import Prelude (show, class Show, bind, (<>), ($))
-import Unsafe.Coerce (unsafeCoerce)
+import Prelude (class Show, show, ($), (<>))
 
 -- || FFI for D3
 foreign import data D3 :: !
 foreign import data D3Element :: *
+-- the underlying D3 selection that is passed between calls
+foreign import data D3Selection :: *
+-- a Selection that's passed back in some callbacks
+foreign import data Peers       :: *
+-- the `this` pointer in a callback, DOM element receiving an event
+foreign import data DomElement  :: *
 
 
 type D3Eff a = ∀ e. Eff (d3 :: D3 | e) a
@@ -67,21 +70,8 @@ instance isShowTypenames :: Show Typenames where
       f {name: (Just n), type: t } acc = ((show t) <> "." <> n) : acc
       f {name: Nothing,  type: t } acc =             (show t)  : acc
 
-theHorror :: ∀ t0. t0
-theHorror = unsafeCoerce writeNull
-
 foreign import transparent :: String
 foreign import opaque :: String
-
--- | These next two operators are really key to making this DSL look like D3 in JavaScript
--- | All respect to pelotom for cooking them up in the original purescript-d3!
-
--- Syntactic sugar to make chained monadic statements look similar to the
--- "fluid interface" style of chained method calls in JavaScript
-infixl 4 bind as ..
--- Reversed function application, useful for applying extended monadic chains
--- to already-obtained values
-infixl 4 applyFlipped as ...
 
 -- for selection.classed and selection.attr:
 type PredicateFn    d x = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) x)

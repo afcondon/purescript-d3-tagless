@@ -5,16 +5,7 @@ import DOM.Event.Types (Event)
 import Data.Newtype (class Newtype)
 import Prelude (class Show, show, (<>))
 import Control.Apply (applySecond)
-
--- ||               Core foreign imports
--- the Effect of D3
-foreign import data D3          :: !
--- the underlying D3 selection that is passed between calls
-foreign import data D3Selection :: *
--- a Selection that's passed back in some callbacks
-foreign import data Peers       :: *
--- the `this` pointer in a callback, DOM element receiving an event
-foreign import data DomElement  :: *
+import D3.Base
 
 -- can be used to provide closer match to the JavaScript D3 syntax if desired
 infixl 4 applySecond as ..  -- maybe clearer than *>

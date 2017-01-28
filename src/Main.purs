@@ -6,10 +6,10 @@ import Data.Monoid (mempty)
 import Prelude (Unit, ($), bind)
 import TaglessD3.Base (Attr(..), D3ElementType(..), D3Transition(..), Duration(..), ValueOrCallback(..), (..))
 import TaglessD3.DOMImpl (run', D3DOMStructure(..)) as D
-import TaglessD3.Selection (class Selection, append, attrs, d3Select, dataA, enter, transition)
+import TaglessD3.Selection (class AbstractSelection, append, attrs, d3Select, dataA, enter, transition)
 import TaglessD3.StringImpl (run') as S
 
-d3Script' :: ∀ m. (Selection m) => m Unit
+d3Script' :: ∀ m. (AbstractSelection m) => m Unit
 d3Script' = d3Select "#chart"
          .. dataA [1,2,3,4,5]
          .. enter

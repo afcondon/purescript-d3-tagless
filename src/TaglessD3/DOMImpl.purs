@@ -4,7 +4,7 @@ import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
 import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector, renderArrayOfAttributes)
-import TaglessD3.Selection (class Selection)
+import TaglessD3.Selection (class AbstractSelection)
 
 data D3DOMStructure = D3S String
 
@@ -38,7 +38,7 @@ d3StructureFn (D3Selection f) = f
 
 instance monadD3Selection :: Monad D3Selection
 
-instance selectionDummySelection :: Selection D3Selection where
+instance selectionDummySelection :: AbstractSelection D3Selection where
     d3Select selector    = D3Selection $ d3Select' selector
     d3SelectAll selector = D3Selection $ d3SelectAll' selector
     select selector      = D3Selection $ select' selector
@@ -57,49 +57,49 @@ instance selectionDummySelection :: Selection D3Selection where
     dataHI hd index      = D3Selection $ dataHI' hd index
 
 d3Select' :: Selector -> D3DOMStructure -> Tuple Unit D3DOMStructure
-d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
+d3Select' selector d3s = Tuple unit d3s
 
 d3SelectAll' :: Selector -> D3DOMStructure -> Tuple Unit D3DOMStructure
-d3SelectAll' selector d3s = Tuple unit $ d3s ++ ["D3SelectAll", selector]
+d3SelectAll' selector d3s = Tuple unit d3s
 
 select' :: Selector -> D3DOMStructure -> Tuple Unit D3DOMStructure
-select' selector d3s = Tuple unit $ d3s ++ ["select", selector]
+select' selector d3s = Tuple unit d3s
 
 selectAll' :: Selector -> D3DOMStructure -> Tuple Unit D3DOMStructure
-selectAll' selector d3s = Tuple unit $ d3s ++ ["selectAll", selector]
+selectAll' selector d3s = Tuple unit d3s
 
 insert' :: D3ElementType -> D3DOMStructure -> Tuple Unit D3DOMStructure
-insert' element d3s = Tuple unit $ d3s ++ [ "insert", show element ]
+insert' element d3s = Tuple unit d3s
 
 append' :: D3ElementType -> D3DOMStructure -> Tuple Unit D3DOMStructure
-append' element d3s = Tuple unit $ d3s ++ [ "append", show element ]
+append' element d3s = Tuple unit d3s
 
 remove' :: D3DOMStructure -> Tuple Unit D3DOMStructure
-remove' d3s = Tuple unit $ d3s ++ ["Remove"]
+remove' d3s = Tuple unit d3s
 
 enter' :: D3DOMStructure -> Tuple Unit D3DOMStructure
-enter' d3s = Tuple unit $ d3s ++ ["Enter"]
+enter' d3s = Tuple unit d3s
 
 exit' :: D3DOMStructure -> Tuple Unit D3DOMStructure
-exit' d3s = Tuple unit $ d3s ++ ["Exit"]
+exit' d3s = Tuple unit d3s
 
 attrs' :: ∀ d. Array (Attr d) -> D3DOMStructure -> Tuple Unit D3DOMStructure
-attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", renderArrayOfAttributes as ]
+attrs' as d3s = Tuple unit d3s
 
 transition' :: D3Transition -> D3DOMStructure -> Tuple Unit D3DOMStructure
-transition' t d3s = Tuple unit $ d3s ++ [ show t ]
+transition' t d3s = Tuple unit d3s
 
 dataA' :: ∀ d. Array d -> D3DOMStructure -> Tuple (Array d) D3DOMStructure
-dataA' ds d3s = Tuple ds $ d3s ++ ["Data from Array"]
+dataA' ds d3s = Tuple ds d3s
 
 dataH' :: ∀ d. Hierarchy d -> D3DOMStructure -> Tuple (Hierarchy d) D3DOMStructure
-dataH' hd d3s = Tuple hd $ d3s ++ ["Hierarchical data"]
+dataH' hd d3s = Tuple hd d3s
 
 dataAI' :: ∀ d i. Array d -> (d -> i) -> D3DOMStructure -> Tuple (Array d) D3DOMStructure
-dataAI' ds index d3s = Tuple ds $ d3s ++ ["Data from Array with index function"]
+dataAI' ds index d3s = Tuple ds d3s
 
 dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3DOMStructure -> Tuple (Hierarchy d) D3DOMStructure
-dataHI' hd index d3s = Tuple hd $ d3s ++ ["Hierarchical data with index function"]
+dataHI' hd index d3s = Tuple hd d3s
 
 merge' :: D3Selection Unit -> D3DOMStructure -> (Tuple Unit D3DOMStructure)
 merge' (D3Selection f) (D3S name) = Tuple unit (D3S name)
@@ -107,5 +107,3 @@ merge' (D3Selection f) (D3S name) = Tuple unit (D3S name)
 -- | Utility functions
 addD3Statement :: D3DOMStructure -> Array String -> D3DOMStructure
 addD3Statement (D3S name) statements' = D3S name
-
-infixl 4 addD3Statement as ++

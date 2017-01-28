@@ -3,7 +3,7 @@ module TaglessD3.Selection where
 import Prelude
 import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector)
 
-class (Monad m) <= Selection m where
+class (Monad m) <= AbstractSelection m where
     d3Select    :: Selector -> m Unit -- starts out as Unit but becomes foreign type (ie actual d3 selection)
     d3SelectAll :: Selector -> m Unit
     select      :: Selector -> m Unit
