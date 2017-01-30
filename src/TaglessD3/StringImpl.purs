@@ -1,6 +1,6 @@
 module TaglessD3.StringImpl where
 
-import Data.Monoid (class Monoid, mempty)
+import Data.Monoid (class Monoid)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
@@ -22,11 +22,14 @@ instance showD3Structure :: Show D3Structure where
 
 data FakeSelection a = FakeSelection (D3Structure -> Tuple a D3Structure)
 
-run :: ∀ a. FakeSelection a -> D3Structure -> a
-run (FakeSelection f) = fst <<< f
+run :: ∀ a. FakeSelection a -> D3Structure -> Tuple a D3Structure
+run (FakeSelection f) = f
 
-run' :: ∀ a. FakeSelection a -> D3Structure -> D3Structure
-run' (FakeSelection f) = snd <<< f
+runData :: ∀ a. FakeSelection a -> D3Structure -> a
+runData (FakeSelection f) = fst <<< f
+
+runStructure :: ∀ a. FakeSelection a -> D3Structure -> D3Structure
+runStructure (FakeSelection f) = snd <<< f
 
 instance functorFakeSelection :: Functor FakeSelection where
   map f (FakeSelection g) = FakeSelection $ first f <<< g
