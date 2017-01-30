@@ -35,7 +35,6 @@ data D3ElementType
         | SvgText
         -- | SvgUse
 
-
 data Callback d b =   Lambda1 (d ->                                  b)
                     | Lambda2 (d -> Number ->                        b)
                     | Lambda4 (d -> Number -> Peers -> DomElement -> b)

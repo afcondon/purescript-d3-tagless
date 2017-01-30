@@ -5,7 +5,7 @@ import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
 import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector, renderArrayOfAttributes)
-import TaglessD3.Selection (class AbstractSelection)
+import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 
 data D3Structure = D3S String (Array (Array String))
 
@@ -63,10 +63,10 @@ instance selectionDummySelection :: AbstractSelection FakeSelection where
     exit                 = FakeSelection $ exit'
     attrs attributes     = FakeSelection $ attrs' attributes
     transition t         = FakeSelection $ transition' t
-    dataA ds             = FakeSelection $ dataA' ds
-    dataH hd             = FakeSelection $ dataH' hd
-    dataAI ds index      = FakeSelection $ dataAI' ds index
-    dataHI hd index      = FakeSelection $ dataHI' hd index
+    dataBind (ArrayD ds)     = FakeSelection $ dataA' ds
+    dataBind (HierarchyD ds) = FakeSelection $ dataH' ds
+    dataBind (ArrayDWithIndex ds i)     = FakeSelection $ dataAI' ds i
+    dataBind (HierarchyDWithIndex ds i) = FakeSelection $ dataHI' ds i
 
 d3Select' :: Selector -> D3Structure -> Tuple Unit D3Structure
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
@@ -101,23 +101,23 @@ attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", renderArrayOfAttributes as
 transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]
 
-dataA' :: ∀ d. Array d -> D3Structure -> Tuple (Array d) D3Structure
-dataA' ds d3s = Tuple ds $ d3s ++ ["Data from Array"]
+dataA' :: ∀ d. Array d -> D3Structure -> Tuple Unit D3Structure
+dataA' ds d3s = Tuple unit $ d3s ++ ["Data from Array"]
 
-dataH' :: ∀ d. Hierarchy d -> D3Structure -> Tuple (Hierarchy d) D3Structure
-dataH' hd d3s = Tuple hd $ d3s ++ ["Hierarchical data"]
+dataH' :: ∀ d. Hierarchy d -> D3Structure -> Tuple Unit D3Structure
+dataH' hd d3s = Tuple unit $ d3s ++ ["Hierarchical data"]
 
-dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple (Array d) D3Structure
-dataAI' ds index d3s = Tuple ds $ d3s ++ ["Data from Array with index function"]
+dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple Unit D3Structure
+dataAI' ds index d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
 
-dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3Structure -> Tuple (Hierarchy d) D3Structure
-dataHI' hd index d3s = Tuple hd $ d3s ++ ["Hierarchical data with index function"]
+dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3Structure -> Tuple Unit D3Structure
+dataHI' hd index d3s = Tuple unit $ d3s ++ ["Hierarchical data with index function"]
 
 -- the selection being merged is added to our selection, but don't yet
 -- understand how to capture name from merged selection? maybe change f to
 -- different function?
-merge' :: FakeSelection Unit -> D3Structure -> (Tuple Unit D3Structure)
-merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
+merge' :: FakeSelection Unit -> D3Structure -> (Tuple String D3Structure)
+merge' (FakeSelection f) (D3S name statements) = Tuple "merged" (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
 
 
 -- | Utility functions
