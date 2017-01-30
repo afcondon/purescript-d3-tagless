@@ -70,7 +70,10 @@ instance selectionDummySelection :: AbstractSelection (D3Monad d i) where
 
 -- NB all functions are stubs ATM
 d3Select' :: ∀ d i. Selector -> D3Structure d i -> Tuple Unit (D3Structure d i)
-d3Select' selector d3s = Tuple unit d3s
+d3Select' selector d3s = Tuple unit d3s -- but what we'd really like to do is in comment
+    -- do
+    --     foo <- D3.d3Select selector
+    --     Tuple unit (updateSelection d3s foo)
 
 d3SelectAll' :: ∀ d i. Selector -> D3Structure d i -> Tuple Unit (D3Structure d i)
 d3SelectAll' selector d3s = Tuple unit d3s

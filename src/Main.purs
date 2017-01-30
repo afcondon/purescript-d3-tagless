@@ -6,7 +6,7 @@ import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
 import Number (divide)
-import Prelude (Unit, bind, id, ($))
+import Prelude (Unit, bind, id, pure, unit, ($))
 import TaglessD3.Base (Attr(..), D3ElementType(..), D3Transition(..), Duration(..), ValueOrCallback(..), (..))
 import TaglessD3.DOMImpl (runStructure, D3Structure(..)) as D
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, transition)
