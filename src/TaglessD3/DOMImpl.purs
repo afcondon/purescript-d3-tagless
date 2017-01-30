@@ -32,32 +32,34 @@ instance applicativeD3Monad :: Applicative (D3Monad d) where
 
 instance bindD3Monad :: Bind (D3Monad d) where
     bind d3m@(D3Monad s d x) k = concat d3m $ k x
+        where
+        concat :: ∀  s d s' d'. D3Monad s d -> D3Monad s' d' -> D3Monad s d'
+        concat (D3Monad s d x) (D3Monad s' d' y) = (D3Monad s d y)
 
-concat :: ∀  s d s' d'. D3Monad s d -> D3Monad s' d' -> D3Monad s d'
-concat (D3Monad s d x) (D3Monad s' d' y) = (D3Monad s d y)
 
 instance monadD3Monad :: Monad (D3Monad d)
 
--- instance selectionDummySelection :: AbstractSelection D3Monad where
---     d3Select selector    = Selection
---     d3SelectAll selector = Selection
---     select selector      = Selection
---     selectAll selector   = Selection
---     merge selection      = Selection
---     insert element       = Selection
---     append element       = Selection
---     remove               = Selection
---     enter                = Selection
---     exit                 = Selection
---     attrs attributes     = Selection
---     transition t         = Selection
---     dataA ds             = Selection
---     dataH hd             = Selection
---     dataAI ds index      = Selection
---     dataHI hd index      = Selection
---
--- d3Select' :: ∀ d. Selector ->
---
+instance selectionDummySelection :: AbstractSelection (D3Monad d) where
+    d3Select selector    = D3Monad (d3Select'    selector) Nothing unit
+    d3SelectAll selector = D3Monad (d3SelectAll' selector) Nothing unit
+    select selector      = D3Monad (select'      selector) Nothing unit
+    selectAll selector   = D3Monad (selectAll'   selector) Nothing unit
+    merge selection      = D3Monad
+    insert element       = D3Monad
+    append element       = D3Monad
+    remove               = D3Monad
+    enter                = D3Monad
+    exit                 = D3Monad
+    attrs attributes     = D3Monad
+    transition t         = D3Monad
+    dataA ds             = D3Monad
+    dataH hd             = D3Monad
+    dataAI ds index      = D3Monad
+    dataHI hd index      = D3Monad
+
+d3Select' :: ∀ d. Selector -> Maybe (D3.Selection d)
+d3Select' _ = Nothing
+
 -- d3Select' :: ∀ d. Selector -> D3DOMStructure d -> Tuple Unit (D3DOMStructure d)
 -- d3Select' selector d3s = Tuple unit (D3S (d3Select selector))
 --
