@@ -13,6 +13,16 @@ import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 data D3Structure d i = D3S { selection :: Maybe (D3.Selection d), "data" :: Maybe (D3Data d i) }
 data D3Monad d i a = D3Monad (D3Structure d i -> Tuple a (D3Structure d i))
 
+run :: ∀ d i a. D3Monad d i a -> D3Structure d i -> Tuple a (D3Structure d i)
+run (D3Monad f) = f
+
+runData :: ∀ d i a. D3Monad d i a -> D3Structure d i -> a
+runData (D3Monad f) = fst <<< f
+
+runStructure :: ∀ d i a. D3Monad d i a -> D3Structure d i -> D3Structure d i
+runStructure (D3Monad f) = snd <<< f
+
+
 instance functorD3Monad :: Functor (D3Monad d i) where
     map f (D3Monad g) = D3Monad $ first f <<< g
 
