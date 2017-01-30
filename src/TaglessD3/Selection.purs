@@ -3,10 +3,8 @@ module TaglessD3.Selection where
 import Prelude
 import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector)
 
-data D3Data d i = ArrayD (Array d)
-                | HierarchyD (Hierarchy d)
-                | ArrayDWithIndex (Array d) (d -> i)
-                | HierarchyDWithIndex (Hierarchy d) (d -> i)
+data D3Data d i = ArrayD (Array d) (d -> i)
+                | HierarchyD (Hierarchy d) (d -> i)
 
 class (Monad m) <= AbstractSelection m where
     d3Select    :: Selector -> m Unit -- starts out as Unit but becomes foreign type (ie actual d3 selection)

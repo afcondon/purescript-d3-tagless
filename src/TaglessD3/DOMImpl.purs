@@ -5,13 +5,23 @@ import D3.Selection (Selection, d3Select) as D3
 import Data.Maybe (Maybe(..))
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, show, unit, ($), (<<<), (<>), (<$>))
-import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector, renderArrayOfAttributes)
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, unit, ($), (<<<), (<>))
+import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector)
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 
 -- | a very simple Monad to hold the Selection and the data that is bound to it
 data D3Structure d i = D3S { selection :: Maybe (D3.Selection d), "data" :: Maybe (D3Data d i) }
 data D3Monad d i a = D3Monad (D3Structure d i -> Tuple a (D3Structure d i))
+
+instance showD3Structure :: Show (D3Structure d i) where
+  show (D3S { selection: s, "data": d }) = "Selection: " <> ss <> " " <> ds where
+    ss = case s of
+         Just _  -> "Has a selection"
+         Nothing -> "Unitialized selection"
+    ds = case d of
+         Just (ArrayD _ _)      -> "Array data bound"
+         Just (HierarchyD _ _)  -> "Hierarchical data bound"
+         Nothing -> "No data has been bound"
 
 run :: ∀ d i a. D3Monad d i a -> D3Structure d i -> Tuple a (D3Structure d i)
 run (D3Monad f) = f
@@ -55,11 +65,8 @@ instance selectionDummySelection :: AbstractSelection (D3Monad d i) where
     exit                 = D3Monad $ exit'
     attrs attributes     = D3Monad $ attrs' attributes
     transition t         = D3Monad $ transition' t
-    dataBind (ArrayD ds)     = D3Monad $ dataA' ds
-    dataBind (HierarchyD ds) = D3Monad $ dataH' ds
-    dataBind (ArrayDWithIndex ds i)     = D3Monad $ dataAI' ds i
-    dataBind (HierarchyDWithIndex ds i) = D3Monad $ dataHI' ds i
-
+    dataBind (ArrayD ds i)     = D3Monad $ dataAI' ds i
+    dataBind (HierarchyD ds i) = D3Monad $ dataHI' ds i
 
 -- NB all functions are stubs ATM
 d3Select' :: ∀ d i. Selector -> D3Structure d i -> Tuple Unit (D3Structure d i)
@@ -97,12 +104,6 @@ attrs' as d3s = Tuple unit d3s
 
 transition' :: ∀ d i. D3Transition -> D3Structure d i -> Tuple Unit (D3Structure d i)
 transition' t d3s = Tuple unit d3s
-
-dataA' :: ∀ d d' i. Array d' -> D3Structure d i -> Tuple Unit (D3Structure d i)
-dataA' ds d3s = Tuple unit d3s
-
-dataH' :: ∀ d d' i. Hierarchy d' -> D3Structure d i -> Tuple Unit (D3Structure d i)
-dataH' hd d3s = Tuple unit d3s
 
 dataAI' :: ∀ d d' i i'. Array d' -> (d' -> i') -> D3Structure d i -> Tuple Unit (D3Structure d i)
 dataAI' ds index d3s = Tuple unit d3s

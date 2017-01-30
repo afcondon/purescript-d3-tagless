@@ -63,10 +63,8 @@ instance selectionDummySelection :: AbstractSelection FakeSelection where
     exit                 = FakeSelection $ exit'
     attrs attributes     = FakeSelection $ attrs' attributes
     transition t         = FakeSelection $ transition' t
-    dataBind (ArrayD ds)     = FakeSelection $ dataA' ds
-    dataBind (HierarchyD ds) = FakeSelection $ dataH' ds
-    dataBind (ArrayDWithIndex ds i)     = FakeSelection $ dataAI' ds i
-    dataBind (HierarchyDWithIndex ds i) = FakeSelection $ dataHI' ds i
+    dataBind (ArrayD ds i)     = FakeSelection $ dataAI' ds i
+    dataBind (HierarchyD ds i) = FakeSelection $ dataHI' ds i
 
 d3Select' :: Selector -> D3Structure -> Tuple Unit D3Structure
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
@@ -100,12 +98,6 @@ attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", renderArrayOfAttributes as
 
 transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]
-
-dataA' :: ∀ d. Array d -> D3Structure -> Tuple Unit D3Structure
-dataA' ds d3s = Tuple unit $ d3s ++ ["Data from Array"]
-
-dataH' :: ∀ d. Hierarchy d -> D3Structure -> Tuple Unit D3Structure
-dataH' hd d3s = Tuple unit $ d3s ++ ["Hierarchical data"]
 
 dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple Unit D3Structure
 dataAI' ds index d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
