@@ -12,6 +12,10 @@ type Selector = String
 
 data Duration = Seconds Int | MS Int
 
+data Callback d b =   Lambda1 (d ->                                  b)
+                    | Lambda2 (d -> Number ->                        b)
+                    | Lambda4 (d -> Number -> Peers -> DomElement -> b)
+
 data D3Transition = SimpleTransition Duration
                   | NamedTransition String Duration
 

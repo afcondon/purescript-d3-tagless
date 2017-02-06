@@ -1,12 +1,13 @@
 module TaglessD3.StringImpl where
 
+import TaglessD3.AttrNew
+import Data.List (List)
 import Data.Monoid (class Monoid)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
 import TaglessD3.Base (D3ElementType, D3Transition, Hierarchy, Selector)
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
-import TaglessD3.Attr
 
 data D3Structure = D3S String (Array (Array String))
 
@@ -94,8 +95,8 @@ enter' d3s = Tuple unit $ d3s ++ ["Enter"]
 exit' :: D3Structure -> Tuple Unit D3Structure
 exit' d3s = Tuple unit $ d3s ++ ["Exit"]
 
-attrs' :: ∀ d. Array (Attr d) -> D3Structure -> Tuple Unit D3Structure
-attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", renderArrayOfAttributes as ]
+attrs' :: List Attr -> D3Structure -> Tuple Unit D3Structure
+attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", "renderArrayOfAttributes as" ]
 
 transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]

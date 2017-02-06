@@ -1,8 +1,9 @@
 module TaglessD3.Selection where
 
 import Prelude
+import TaglessD3.AttrNew
+import Data.List (List)
 import TaglessD3.Base (D3ElementType, D3Transition, Hierarchy, Selector)
-import TaglessD3.Attr
 
 data D3Data d i = ArrayD (Array d) (d -> i)
                 | HierarchyD (Hierarchy d) (d -> i)
@@ -19,5 +20,5 @@ class (Monad m) <= AbstractSelection m where
     enter       :: m Unit
     exit        :: m Unit
     transition  :: D3Transition -> m Unit
-    attrs       :: ∀ d. Array (Attr d) -> m Unit
+    attrs       :: List Attr -> m Unit
     dataBind    :: ∀ d i. D3Data d i -> m Unit
