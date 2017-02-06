@@ -49,39 +49,27 @@ data Attr = CX                  Attr' -- circles only
         --   | Stroke              (ValueOrCallback d Color)
 
 
+
+
 -- constructors to make Attributes for primitive types, used as direct value
-mkAttrInt :: Int -> Attr'
-mkAttrInt i = mkExists (D3Attr { value: i, apply: dummyD3Op })
+attrInt :: Int -> Attr'
+attrInt i = mkExists (D3Attr { value: i, apply: dummyD3Op })
 
-mkAttrChar :: Char -> Attr'
-mkAttrChar c = mkExists (D3Attr { value: c, apply: dummyD3Op })
+attrChar :: Char -> Attr'
+attrChar c = mkExists (D3Attr { value: c, apply: dummyD3Op })
 
-mkAttrString :: String -> Attr'
-mkAttrString s = mkExists (D3Attr { value: s, apply: dummyD3Op })
+attrString :: String -> Attr'
+attrString s = mkExists (D3Attr { value: s, apply: dummyD3Op })
 
 -- now constructors for Attributes that are indirect - take a callback from another type
-mkAttrIntP :: ∀ d. (d -> Int) -> Attr'
-mkAttrIntP fi = mkExists (D3Attr { value: fi, apply: dummyD3Op })
+attrIntP :: ∀ d. (d -> Int) -> Attr'
+attrIntP fi = mkExists (D3Attr { value: fi, apply: dummyD3Op })
 
-mkAttrCharP :: ∀ d. (d -> Char) -> Attr'
-mkAttrCharP fc = mkExists (D3Attr { value: fc, apply: dummyD3Op })
+attrCharP :: ∀ d. (d -> Char) -> Attr'
+attrCharP fc = mkExists (D3Attr { value: fc, apply: dummyD3Op })
 
-mkAttrStringP :: ∀ d. (d -> String) -> Attr'
-mkAttrStringP fs = mkExists (D3Attr { value: fs, apply: dummyD3Op })
-
-
--- an example list of attributes and an example main operating on them
-attrList :: List Attr
-attrList = fromFoldable $ [ CX $ mkAttrInt 1, Style "width" $ mkAttrString "48%" ]
-
--- an example of a typed callback function
-type ExData = { name :: String, age :: Int }
-lp :: ExData -> Char
-lp { name, age } =
-    case name, age of
-    "awn", _ -> 'a'
-    _, 0     -> 'b'
-    _, _     -> 'c'
+attrStringP :: ∀ d. (d -> String) -> Attr'
+attrStringP fs = mkExists (D3Attr { value: fs, apply: dummyD3Op })
 
 -- main2 :: D3Effect
 -- main2 = do
