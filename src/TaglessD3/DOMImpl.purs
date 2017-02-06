@@ -13,14 +13,17 @@ import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 data D3Structure d i = D3S { selection :: Maybe (D3.Selection d), "data" :: Maybe (D3Data d i) }
 data D3Monad d i a = D3Monad (D3Structure d i -> Tuple a (D3Structure d i))
 
+initD3Selection :: ∀ d i. D3Structure d i
+initD3Selection = D3S { selection: Nothing, "data": Nothing }
+
 instance showD3Structure :: Show (D3Structure d i) where
   show (D3S { selection: s, "data": d }) = "Selection: " <> ss <> " " <> ds where
     ss = case s of
          Just _  -> "Has a selection"
          Nothing -> "Unitialized selection"
     ds = case d of
-         Just (ArrayD _ _)      -> "Array data bound"
-         Just (HierarchyD _ _)  -> "Hierarchical data bound"
+         Just (ArrayD _ _)      -> "Data: Array"
+         Just (HierarchyD _ _)  -> "Data: Hierarchical"
          Nothing -> "No data has been bound"
 
 run :: ∀ d i a. D3Monad d i a -> D3Structure d i -> Tuple a (D3Structure d i)
@@ -53,18 +56,18 @@ d3StructureFn (D3Monad f) = f
 instance monadD3Monad :: Monad (D3Monad d i)
 
 instance selectionDummySelection :: AbstractSelection (D3Monad d i) where
-    d3Select selector    = D3Monad $ d3Select' selector
-    d3SelectAll selector = D3Monad $ d3SelectAll' selector
-    select selector      = D3Monad $ select' selector
-    selectAll selector   = D3Monad $ selectAll' selector
-    merge selection      = D3Monad $ merge' selection
-    insert element       = D3Monad $ insert' element
-    append element       = D3Monad $ append' element
-    remove               = D3Monad $ remove'
-    enter                = D3Monad $ enter'
-    exit                 = D3Monad $ exit'
-    attrs attributes     = D3Monad $ attrs' attributes
-    transition t         = D3Monad $ transition' t
+    d3Select selector          = D3Monad $ d3Select' selector
+    d3SelectAll selector       = D3Monad $ d3SelectAll' selector
+    select selector            = D3Monad $ select' selector
+    selectAll selector         = D3Monad $ selectAll' selector
+    merge selection            = D3Monad $ merge' selection
+    insert element             = D3Monad $ insert' element
+    append element             = D3Monad $ append' element
+    remove                     = D3Monad $ remove'
+    enter                      = D3Monad $ enter'
+    exit                       = D3Monad $ exit'
+    attrs attributes           = D3Monad $ attrs' attributes
+    transition t               = D3Monad $ transition' t
     dataBind (ArrayD ds i)     = D3Monad $ dataAI' ds i
     dataBind (HierarchyD ds i) = D3Monad $ dataHI' ds i
 
