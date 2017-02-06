@@ -2,7 +2,8 @@ module Main where
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
-import D3.Base (D3Selection)
+import D3.Base (D3, D3Selection)
+import D3Tagless.AttrNew (main2)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
@@ -31,11 +32,9 @@ myData' = ArrayD [1,2,3,4,5] (\i -> divide (toNumber i) 2.0)
 -- myData :: D3Data Int Int
 myData = ArrayD [1,2,3,4,5] id
 
-myD3Selection :: D.D3Structure Int Int
-myD3Selection = (D.D3S { selection: Nothing, "data": Nothing })
-
-main :: forall e. Eff (console :: CONSOLE | e) Unit
+main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
+    main2
     logShow $ S.runStructure d3Script' mempty
     log "\n\n\n====== cool beans =======\n\n\n"
     logShow $ D.runStructure d3Script' (initD3Selection :: D.D3Structure Char Char)
