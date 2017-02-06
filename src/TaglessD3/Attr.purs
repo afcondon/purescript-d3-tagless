@@ -5,6 +5,7 @@ import TaglessD3.Base (SVGPathString)
 import D3.Base (DomElement, Peers)
 import Color (Color)
 import DOM.Event.Types (Event)
+import TaglessD3.AttrNew
 
 data Callback d b =   Lambda1 (d ->                                  b)
                     | Lambda2 (d -> Number ->                        b)

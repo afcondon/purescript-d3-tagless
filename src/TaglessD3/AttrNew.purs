@@ -1,11 +1,11 @@
-module D3Tagless.AttrNew where
+module TaglessD3.AttrNew where
 
 import Control.Monad.Eff (Eff)
-import D3.Base (D3, D3Selection)
+import D3.Base (D3)
 import Data.Exists (Exists, mkExists, runExists)
 import Data.List (List, fromFoldable)
 import Data.Traversable (traverse)
-import Prelude (Unit, bind, map, pure, unit, ($), (+), (<>))
+import Prelude (Unit, bind, pure, unit, ($))
 
 type D3Effect = ∀ e. Eff (d3 :: D3 | e) Unit
 

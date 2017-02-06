@@ -1,7 +1,8 @@
 module TaglessD3.Selection where
 
 import Prelude
-import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector)
+import TaglessD3.Base (D3ElementType, D3Transition, Hierarchy, Selector)
+import TaglessD3.Attr
 
 data D3Data d i = ArrayD (Array d) (d -> i)
                 | HierarchyD (Hierarchy d) (d -> i)

@@ -6,8 +6,9 @@ import Data.Maybe (Maybe(..))
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, Unit, ap, unit, ($), (<<<), (<>))
-import TaglessD3.Base (Attr, D3ElementType, D3Transition, Hierarchy, Selector)
+import TaglessD3.Base (D3ElementType, D3Transition, Hierarchy, Selector)
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
+import TaglessD3.Attr
 
 -- | a very simple Monad to hold the Selection and the data that is bound to it
 data D3Structure d i = D3S { selection :: Maybe (D3.Selection d), "data" :: Maybe (D3Data d i) }
