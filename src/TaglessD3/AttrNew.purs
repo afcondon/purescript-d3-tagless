@@ -14,7 +14,7 @@ module TaglessD3.AttrNew (
 import Control.Monad.Eff (Eff)
 import D3.Base (D3)
 import Data.Exists (Exists, mkExists, runExists)
-import Data.List (List, foldl, fromFoldable)
+import Data.List (List(..), foldl, fromFoldable, intercalate)
 import Data.Traversable (traverse)
 import Prelude (class Show, Unit, bind, const, map, pure, show, unit, ($), (<>))
 
@@ -34,36 +34,36 @@ dummyD3OpF :: ∀ d a. D3Selection' -> (d -> a) -> D3Effect
 dummyD3OpF s fa = pure unit
 
 renderArrayOfAttributes :: List Attr -> String
-renderArrayOfAttributes attrs = foldl go "" attrs
+renderArrayOfAttributes attrs = intercalate ", " $ foldl go Nil attrs
     where
-    go :: String -> Attr -> String
-    go acc attr = show attr <> acc
+    go :: List String -> Attr -> List String
+    go acc attr = Cons (show attr) acc
 
 instance showD3Attr :: Show (D3Attr a) where
   show (D3Attr { value, showValue }) = "Attr a: " <> showValue value
 
 instance showAttr :: Show Attr where
-  show (CX a) =  "CX" <> runExists showOne a
-  show (CY _) =  "CY"
-  show (R _)  =  "R"
-  show (X _)  =  "X"
-  show (Y _)  =  "Y"
-  show (DX _) =  "DX"
-  show (DY _) =  "DY"
-  show (Height _) =  "Height"
-  show (Width _)  =  "Width"
-  show (StrokeWidth _)   =  "StrokeWidth"
-  show (StrokeOpacity _) =  "StrokeOpacity"
-  show (FillOpacity _)   =  "FillOpacity"
-  show (Opacity _)       =  "Opacity"
-  show (D _)  =  "D"
-  show (Id _) =  "Id"
-  show (StrokeLineCap _) =  "StrokeLineCap"
-  show (PatternUnits _)  =  "PatternUnits"
-  show (Style _ _) =  "Style"
-  show (Class _)   =  "Class"
-  show (Text _)    =  "Text"
-  show (Type _)    =  "Type"
+  show (CX a) =  "CX: " <> runExists showOne a
+  show (CY a) =  "CY: " <> runExists showOne a
+  show (R a)  =  "R: " <> runExists showOne a
+  show (X a)  =  "X: " <> runExists showOne a
+  show (Y a)  =  "Y: " <> runExists showOne a
+  show (DX a) =  "DX: " <> runExists showOne a
+  show (DY a) =  "DY: " <> runExists showOne a
+  show (Height a) =  "Height: " <> runExists showOne a
+  show (Width a)  =  "Width: " <> runExists showOne a
+  show (StrokeWidth a)   =  "StrokeWidth: " <> runExists showOne a
+  show (StrokeOpacity a) =  "StrokeOpacity: " <> runExists showOne a
+  show (FillOpacity a)   =  "FillOpacity: " <> runExists showOne a
+  show (Opacity a)       =  "Opacity: " <> runExists showOne a
+  show (D a)  =  "D: " <> runExists showOne a
+  show (Id a) =  "Id: " <> runExists showOne a
+  show (StrokeLineCap a) =  "StrokeLineCap: " <> runExists showOne a
+  show (PatternUnits a)  =  "PatternUnits: " <> runExists showOne a
+  show (Style s a) =  "Style: " <> s <> " " <> runExists showOne a
+  show (Class a)   =  "Class: " <> runExists showOne a
+  show (Text a)    =  "Text: " <> runExists showOne a
+  show (Type a)    =  "Type: " <> runExists showOne a
 
 data Attr = CX                  Attr' -- circles only
           | CY                  Attr' -- circles only
