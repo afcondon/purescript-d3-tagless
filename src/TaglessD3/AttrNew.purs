@@ -8,12 +8,14 @@ module TaglessD3.AttrNew (
     , attrCharP
     , attrString
     , attrStringP
+    , attributes
     , renderArrayOfAttributes
     )where
 
 import Control.Monad.Eff (Eff)
 import D3.Base (D3)
 import Data.Exists (Exists, mkExists, runExists)
+import Data.Foldable (class Foldable)
 import Data.List (List(..), foldl, fromFoldable, intercalate)
 import Data.Traversable (traverse)
 import Prelude (class Show, Unit, bind, const, map, pure, show, unit, ($), (<>))
@@ -90,6 +92,8 @@ data Attr = CX                  Attr' -- circles only
         --   | Stroke              (ValueOrCallback d Color)
 
 
+attributes :: ∀ f. (Foldable f) => (∀ a. f a -> List a)
+attributes = fromFoldable
 
 
 -- constructors to make Attributes for primitive types, used as direct value

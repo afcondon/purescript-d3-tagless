@@ -9,7 +9,7 @@ import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
 import Number (divide)
 import Prelude (Unit, bind, id, pure, unit, ($))
-import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString)
+import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
 import TaglessD3.Base (D3ElementType(..), D3Transition(..), Duration(..), (..))
 import TaglessD3.DOMImpl (initD3Selection)
 import TaglessD3.DOMImpl (runStructure, D3Structure(..)) as D
@@ -27,7 +27,7 @@ d3Script' = d3Select "#chart"
 myTransition = NamedTransition "t1" $ MS 500
 myData   = ArrayD [1,2,3,4,5] id                              -- array data with default (id) index fn
 myData'  = ArrayD [1,2,3,4,5] (\i -> divide (toNumber i) 2.0) -- array data with lambda index fn
-attrList = fromFoldable $ [ CX $ attrInt 1
+attrList = attributes $ [ CX $ attrInt 1
                           , Style "width" $ attrString "48%"
                           , Style "height" $ attrCharP lp ]
 
