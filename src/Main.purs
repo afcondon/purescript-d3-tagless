@@ -2,17 +2,15 @@ module Main where
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
-import D3.Base (D3, D3Selection)
+import D3.Base (D3)
 import Data.Int (toNumber)
-import Data.List (List, fromFoldable)
-import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
 import Number (divide)
-import Prelude (Unit, bind, id, pure, unit, ($))
+import Prelude (Unit, bind, id, ($))
 import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
 import TaglessD3.Base (D3ElementType(..), D3Transition(..), Duration(..), (..))
 import TaglessD3.DOMImpl (initD3Selection)
-import TaglessD3.DOMImpl (runStructure, D3Structure(..)) as D
+import TaglessD3.DOMImpl (D3Structure, runStructure) as D
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, transition)
 import TaglessD3.StringImpl (runStructure) as S
 
@@ -25,11 +23,11 @@ d3Script' = d3Select "#chart"
          .. transition myTransition
 
 myTransition = NamedTransition "t1" $ MS 500
-myData   = ArrayD [1,2,3,4,5] id                              -- array data with default (id) index fn
-myData'  = ArrayD [1,2,3,4,5] (\i -> divide (toNumber i) 2.0) -- array data with lambda index fn
-attrList = attributes $ [ CX $ attrInt 1
-                          , Style "width" $ attrString "48%"
-                          , Style "height" $ attrCharP lp ]
+myData       = ArrayD [1,2,3,4,5] id                              -- array data with default (id) index fn
+myData'      = ArrayD [1,2,3,4,5] (\i -> divide (toNumber i) 2.0) -- array data with lambda index fn
+attrList     = attributes $ [ CX $ attrInt 1
+                            , Style "width" $ attrString "48%"
+                            , Style "height" $ attrCharP lp ] -- shows callback but also demos like of typecheck on selection...
 
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }

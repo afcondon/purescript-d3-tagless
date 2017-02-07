@@ -17,8 +17,7 @@ import D3.Base (D3)
 import Data.Exists (Exists, mkExists, runExists)
 import Data.Foldable (class Foldable)
 import Data.List (List(..), foldl, fromFoldable, intercalate)
-import Data.Traversable (traverse)
-import Prelude (class Show, Unit, bind, const, map, pure, show, unit, ($), (<>))
+import Prelude (class Show, Unit, const, map, pure, show, unit, ($), (<>))
 
 type D3Effect = ∀ e. Eff (d3 :: D3 | e) Unit
 
@@ -116,19 +115,6 @@ attrCharP fc = mkExists (D3Attr { value: fc, showValue: const "(function)", appl
 attrStringP :: ∀ d. (d -> String) -> Attr'
 attrStringP fs = mkExists (D3Attr { value: fs, showValue: const "(function)", apply: dummyD3Op })
 
--- main2 :: D3Effect
--- main2 = do
---     applyAll unit ?attrList
---
--- applyAll :: D3Selection' -> List Attr -> D3Effect
--- applyAll s list = do
---     traverse (runExists applyOne) list
---     pure unit
---   where
---     applyOne :: ∀ a. (D3Attr a) -> D3Effect
---     applyOne (D3Attr ops) = ops.apply s ops.value
---
---
 showAll :: List Attr' -> List String
 showAll = map (runExists showOne)
 
