@@ -96,7 +96,7 @@ exit' :: D3Structure -> Tuple Unit D3Structure
 exit' d3s = Tuple unit $ d3s ++ ["Exit"]
 
 attrs' :: List Attr -> D3Structure -> Tuple Unit D3Structure
-attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", "renderArrayOfAttributes as" ]
+attrs' as d3s = Tuple unit $ d3s ++ [ "Attributes: ", (renderArrayOfAttributes as) ]
 
 transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]

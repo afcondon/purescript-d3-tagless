@@ -73,9 +73,11 @@ instance selectionDummySelection :: AbstractSelection (D3Monad d i) where
     dataBind (ArrayD ds i)     = D3Monad $ dataAI' ds i
     dataBind (HierarchyD ds i) = D3Monad $ dataHI' ds i
 
+
+
 -- NB all functions are stubs ATM
 d3Select' :: ∀ d i. Selector -> D3Structure d i -> Tuple Unit (D3Structure d i)
-d3Select' selector d3s = Tuple unit d3s -- but what we'd really like to do is in comment
+d3Select' selector d3s = Tuple unit d3s
     -- do
     --     foo <- D3.d3Select selector
     --     Tuple unit (updateSelection d3s foo)
