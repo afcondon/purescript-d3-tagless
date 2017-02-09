@@ -5,7 +5,7 @@ import Data.List (List)
 import Data.Monoid (class Monoid)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, pure, show, unit, ($), (<<<), (<>))
 import TaglessD3.Base (D3ElementType, D3Transition, Hierarchy, Selector)
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 
@@ -22,9 +22,10 @@ instance monoidD3Structure :: Monoid D3Structure where
 instance showD3Structure :: Show D3Structure where
   show (D3S name d3s) = "Selection: " <> name <> "\n\t"<> show d3s
 
-data FakeSelection a = FakeSelection (D3Structure -> Tuple a D3Structure)
+type SelectionFn a = (D3Structure -> Tuple a D3Structure)
+data FakeSelection a = FakeSelection (SelectionFn a)
 
-run :: ∀ a. FakeSelection a -> D3Structure -> Tuple a D3Structure
+run :: ∀ a. FakeSelection a -> SelectionFn a
 run (FakeSelection f) = f
 
 runData :: ∀ a. FakeSelection a -> D3Structure -> a
@@ -45,72 +46,69 @@ instance applicativeFakeSelection :: Applicative FakeSelection where
 instance bindFakeSelection :: Bind FakeSelection where
   bind (FakeSelection f) k = FakeSelection $ \z0 ->
     let az1 = f z0
-    in (d3StructureFn $ k $ fst az1) (snd az1)
-
-d3StructureFn :: ∀ a. FakeSelection a -> (D3Structure -> Tuple a D3Structure)
-d3StructureFn (FakeSelection f) = f
+    in (run $ k $ fst az1) (snd az1) -- fst & snd can go when we have pattern match in let
 
 instance monadFakeSelection :: Monad FakeSelection
 
 instance selectionDummySelection :: AbstractSelection FakeSelection where
-    d3Select selector    = FakeSelection $ d3Select' selector
-    d3SelectAll selector = FakeSelection $ d3SelectAll' selector
-    select selector      = FakeSelection $ select' selector
-    selectAll selector   = FakeSelection $ selectAll' selector
-    merge selection      = FakeSelection $ merge' selection
-    insert element       = FakeSelection $ insert' element
-    append element       = FakeSelection $ append' element
-    remove               = FakeSelection $ remove'
-    enter                = FakeSelection $ enter'
-    exit                 = FakeSelection $ exit'
-    attrs attributes     = FakeSelection $ attrs' attributes
-    transition t         = FakeSelection $ transition' t
-    dataBind (ArrayD ds i)     = FakeSelection $ dataAI' ds i
-    dataBind (HierarchyD ds i) = FakeSelection $ dataHI' ds i
+    d3Select selector    = pure $ FakeSelection $ d3Select' selector
+    d3SelectAll selector = pure $ FakeSelection $ d3SelectAll' selector
+    select selector      = pure $ FakeSelection $ select' selector
+    selectAll selector   = pure $ FakeSelection $ selectAll' selector
+    merge selection      = pure $ FakeSelection $ merge' selection
+    insert element       = pure $ FakeSelection $ insert' element
+    append element       = pure $ FakeSelection $ append' element
+    remove               = pure $ FakeSelection $ remove'
+    enter                = pure $ FakeSelection $ enter'
+    exit                 = pure $ FakeSelection $ exit'
+    attrs attributes     = pure $ FakeSelection $ attrs' attributes
+    transition t         = pure $ FakeSelection $ transition' t
+    dataBind (ArrayD ds i)     = pure $ FakeSelection $ dataAI' ds i
+    dataBind (HierarchyD ds i) = pure $ FakeSelection $ dataHI' ds i
 
-d3Select' :: Selector -> D3Structure -> Tuple Unit D3Structure
+d3Select' :: Selector -> SelectionFn Unit
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
 
-d3SelectAll' :: Selector -> D3Structure -> Tuple Unit D3Structure
+d3SelectAll' :: Selector -> SelectionFn Unit
 d3SelectAll' selector d3s = Tuple unit $ d3s ++ ["D3SelectAll", selector]
 
-select' :: Selector -> D3Structure -> Tuple Unit D3Structure
+select' :: Selector -> SelectionFn Unit
 select' selector d3s = Tuple unit $ d3s ++ ["select", selector]
 
-selectAll' :: Selector -> D3Structure -> Tuple Unit D3Structure
+selectAll' :: Selector -> SelectionFn Unit
 selectAll' selector d3s = Tuple unit $ d3s ++ ["selectAll", selector]
 
-insert' :: D3ElementType -> D3Structure -> Tuple Unit D3Structure
+insert' :: D3ElementType -> SelectionFn Unit
 insert' element d3s = Tuple unit $ d3s ++ [ "insert", show element ]
 
-append' :: D3ElementType -> D3Structure -> Tuple Unit D3Structure
+append' :: D3ElementType -> SelectionFn Unit
 append' element d3s = Tuple unit $ d3s ++ [ "append", show element ]
 
-remove' :: D3Structure -> Tuple Unit D3Structure
+remove' :: SelectionFn Unit
 remove' d3s = Tuple unit $ d3s ++ ["Remove"]
 
-enter' :: D3Structure -> Tuple Unit D3Structure
+enter' :: SelectionFn Unit
 enter' d3s = Tuple unit $ d3s ++ ["Enter"]
 
-exit' :: D3Structure -> Tuple Unit D3Structure
+exit' :: SelectionFn Unit
 exit' d3s = Tuple unit $ d3s ++ ["Exit"]
 
-attrs' :: List Attr -> D3Structure -> Tuple Unit D3Structure
+attrs' :: List Attr -> SelectionFn Unit
 attrs' as d3s = Tuple unit $ d3s ++ [ (renderArrayOfAttributes as) ]
 
-transition' :: D3Transition -> D3Structure -> Tuple Unit D3Structure
+transition' :: D3Transition -> SelectionFn Unit
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]
 
-dataAI' :: ∀ d i. Array d -> (d -> i) -> D3Structure -> Tuple Unit D3Structure
+dataAI' :: ∀ d i. Array d -> (d -> i) -> SelectionFn Unit
 dataAI' ds index d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
 
-dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> D3Structure -> Tuple Unit D3Structure
+dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> SelectionFn Unit
 dataHI' hd index d3s = Tuple unit $ d3s ++ ["Hierarchical data with index function"]
 
 -- the selection being merged is added to our selection, but don't yet
 -- understand how to capture name from merged selection? maybe change f to
 -- different function?
-merge' :: FakeSelection Unit -> D3Structure -> (Tuple String D3Structure)
+merge' :: FakeSelection Unit -> SelectionFn String
 merge' (FakeSelection f) (D3S name statements) = Tuple "merged" (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
 
 
