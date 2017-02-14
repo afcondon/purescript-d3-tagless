@@ -51,20 +51,20 @@ instance bindFakeSelection :: Bind FakeSelection where
 instance monadFakeSelection :: Monad FakeSelection
 
 instance selectionDummySelection :: AbstractSelection FakeSelection where
-    d3Select selector    = pure $ FakeSelection $ d3Select' selector
-    d3SelectAll selector = pure $ FakeSelection $ d3SelectAll' selector
-    select selector      = pure $ FakeSelection $ select' selector
-    selectAll selector   = pure $ FakeSelection $ selectAll' selector
-    merge selection      = pure $ FakeSelection $ merge' selection
-    insert element       = pure $ FakeSelection $ insert' element
-    append element       = pure $ FakeSelection $ append' element
-    remove               = pure $ FakeSelection $ remove'
-    enter                = pure $ FakeSelection $ enter'
-    exit                 = pure $ FakeSelection $ exit'
-    attrs attributes     = pure $ FakeSelection $ attrs' attributes
-    transition t         = pure $ FakeSelection $ transition' t
-    dataBind (ArrayD ds i)     = pure $ FakeSelection $ dataAI' ds i
-    dataBind (HierarchyD ds i) = pure $ FakeSelection $ dataHI' ds i
+    d3Select selector    = FakeSelection $ d3Select' selector
+    d3SelectAll selector = FakeSelection $ d3SelectAll' selector
+    select selector      = FakeSelection $ select' selector
+    selectAll selector   = FakeSelection $ selectAll' selector
+    merge selection      = FakeSelection $ merge' selection
+    insert element       = FakeSelection $ insert' element
+    append element       = FakeSelection $ append' element
+    remove               = FakeSelection $ remove'
+    enter                = FakeSelection $ enter'
+    exit                 = FakeSelection $ exit'
+    attrs attributes     = FakeSelection $ attrs' attributes
+    transition t         = FakeSelection $ transition' t
+    dataBind (ArrayD ds i)     = FakeSelection $ dataAI' ds i
+    dataBind (HierarchyD ds i) = FakeSelection $ dataHI' ds i
 
 d3Select' :: Selector -> SelectionFn Unit
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]

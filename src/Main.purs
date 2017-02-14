@@ -3,16 +3,19 @@ module Main where
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import D3.Base (D3)
+import D3Impl (runD3Monad)
 import Data.Int (toNumber)
 import Data.Monoid (mempty)
 import Number (divide)
 import Prelude (Unit, bind, id, ($))
 import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
 import TaglessD3.Base (D3ElementType(..), D3Transition(..), Duration(..), (..))
-import TaglessD3.DOMImpl (initD3Selection)
-import TaglessD3.DOMImpl (D3Structure, runStructure) as D
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, transition)
 import TaglessD3.StringImpl (runStructure) as S
+
+
+d3Script :: ∀ m. (AbstractSelection m) => m Unit
+d3Script = d3Select "#chart"
 
 d3Script' :: ∀ m. (AbstractSelection m) => m Unit
 d3Script' = d3Select "#chart"
@@ -42,6 +45,7 @@ lp { name, age } =
 
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
+    let s = runD3Monad d3Script
     logShow $ S.runStructure d3Script' mempty
     log "\n\n\n====== cool beans =======\n\n\n"
-    logShow $ D.runStructure d3Script' (initD3Selection :: D.D3Structure Char Char)
+    -- logShow $ D.runStructure d3Script'

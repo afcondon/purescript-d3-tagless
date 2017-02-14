@@ -91,7 +91,7 @@ data Attr = CX                  Attr' -- circles only
         --   | Stroke              (ValueOrCallback d Color)
 
 
-attributes :: ∀ f. (Foldable f) => (∀ a. f a -> List a)
+attributes :: ∀ f a. (Foldable f) => f a -> List a
 attributes = fromFoldable
 
 
