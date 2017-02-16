@@ -1,37 +1,38 @@
 module Main where
 
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log, logShow)
+import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3)
 import D3Impl (runD3Monad)
 import Data.Int (toNumber)
+import Data.List (List)
 import Data.Maybe (Maybe(..))
-import Data.Monoid (mempty)
 import Number (divide)
-import Prelude (Unit, bind, id, show, ($), (*>), (>>=), show)
+import Prelude (Unit, bind, ($))
 import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
-import TaglessD3.Base (D3ElementType(..), D3Transition(..), Duration(..), (..))
+import TaglessD3.Base (D3ElementType(SvgText, SvgGroup), D3Transition(NamedTransition), Duration(MS))
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, transition)
-import TaglessD3.StringImpl (runStructure) as S
-
 
 d3Script :: ∀ m. (AbstractSelection m) => m Unit
 d3Script = do
-            d3Select "#chart"
-            append HTMLDiv
+    d3Select "#chart"
+    append SvgGroup
+    dataBind myData'
+    enter
+    append SvgText
+    attrs attrList
+    transition myTransition
 
-d3Script' :: ∀ m. (AbstractSelection m) => m Unit
-d3Script' = do
-            d3Select "#chart"
-            dataBind myData'
-            enter
-            append SvgText
-            attrs attrList
-            transition myTransition
-
+myTransition :: D3Transition
 myTransition = NamedTransition "t1" $ MS 500
+
+myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5] Nothing
+
+myData' :: D3Data Int Number
 myData'      = ArrayD [1,2,3,4,5] (Just \i -> divide (toNumber i) 2.0) -- array data with lambda index fn
+
+attrList :: List Attr
 attrList     = attributes $ [ CX $ attrInt 1
                             , Style "width" $ attrString "48%"
                             , Style "height" $ attrCharP lp ] -- shows callback but also demos like of typecheck on selection...
@@ -51,5 +52,5 @@ main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
     runD3Monad d3Script Nothing
     log "\n\n\n====== cool beans =======\n\n\n"
-    let ss = show $ S.runStructure d3Script' mempty
-    log ss
+    -- let ss = show $ S.runStructure d3Script mempty
+    -- log ss

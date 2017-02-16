@@ -103,10 +103,9 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
 
     dataBind ds = do
         ms <- get
-        let s = case ds of
+        put $ unsafeCoerce $ case ds of  -- Necessary because Selection value was unknown before this data bind 
                 (ArrayD ds (Just k))       -> (unsafePerformEff <<< (D3.dataBindIndexArray ds k)) <$> ms
                 (ArrayD ds Nothing)        -> (unsafePerformEff <<< (D3.dataBindArray ds))        <$> ms
                 (HierarchyD tree (Just k)) -> (unsafePerformEff <<< (D3.dataBindIndexHierarchy tree k)) <$> ms
                 (HierarchyD tree Nothing)  -> (unsafePerformEff <<< (D3.dataBindHierarchy tree))        <$> ms
-        put $ unsafeCoerce s            -- TODO obviously this is not desirable, revisit once DSL works
         pure unit
