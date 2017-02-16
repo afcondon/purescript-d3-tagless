@@ -10,7 +10,10 @@ module D3.Selection
   -- , call   -- TBD
   , call, call1, call2, call3, call4, call5, call6, call7, call8, call9
   , classed
-  , dataBind
+  , dataBindArray
+  , dataBindIndexArray
+  , dataBindHierarchy
+  , dataBindIndexHierarchy
   -- , each   -- TBD
   , empty
   , enter
@@ -31,7 +34,7 @@ module D3.Selection
   ) where
 
 import Control.Monad.Eff (Eff)
-import D3.Base (D3, D3Element, Index, AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), DataBind(Keyed, Data), Filter(Predicate, Selector), PolyValue(SetByIndex, Value))
+import D3.Base (AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
 import DOM.Event.Types (EventType)
 import Data.Function.Eff (EffFn5, EffFn3, EffFn2, EffFn4, EffFn1, runEffFn5, runEffFn3, runEffFn2, runEffFn1, mkEffFn2, mkEffFn4)
 import Data.Maybe (Maybe)
@@ -45,6 +48,8 @@ foreign import appendFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String      
 foreign import attrFn        :: ∀ d v eff.    EffFn3 (d3::D3|eff) String v                    (Selection d) (Selection d)
 foreign import bindDataFn    :: ∀ d1 d2 eff.  EffFn2 (d3::D3|eff) (Array d2)                  (Selection d1) (Selection d2)
 foreign import bindDataFnK   :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Array d2) (d2 -> k)       (Selection d1) (Selection d2)
+foreign import bindHierarchyFn  :: ∀ d1 d2 eff.   EffFn2 (d3::D3|eff) (Hierarchy d2)          (Selection d1) (Selection d2)
+foreign import bindHierarchyFnK :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Hierarchy d2) (d2 -> k) (Selection d1) (Selection d2)
 foreign import classedFn     :: ∀ d eff.      EffFn3 (d3::D3|eff) String Boolean              (Selection d) (Selection d)
 foreign import d3SelectAllFn :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                    (Selection d)
 foreign import d3SelectFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                    (Selection d)
@@ -139,11 +144,19 @@ selectElem element           = runEffFn1 selectElFn element
 select  :: ∀ d eff.  String                     -> Selection d -> Eff (d3::D3|eff) (Selection d)
 select selector              = runEffFn2 selectFn selector
 
-dataBind :: ∀ d1 d2 k eff. DataBind d2 k             -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
 -- would be nice to express that Keyed needs k to be Ord, will have to wait for GADTs
 -- dataBind :: ∀ d k eff. Ord k => DataBind d k    -> Selection d -> Eff (d3::D3|eff) (Selection d)
-dataBind (Data dataArray)         = runEffFn2 bindDataFn dataArray
-dataBind (Keyed dataArray keyFn)  = runEffFn3 bindDataFnK dataArray keyFn
+dataBindArray :: forall eff d2 d1. Array d2 -> Selection d1 -> Eff ( d3 :: D3 | eff ) (Selection d2)
+dataBindArray d         = runEffFn2 bindDataFn d
+
+dataBindIndexArray :: ∀ d1 d2 k eff. Array d2 -> (d2 -> k) -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
+dataBindIndexArray d keyFn   = runEffFn3 bindDataFnK d keyFn
+
+dataBindHierarchy :: ∀ d1 d2 k eff. Hierarchy d2           -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
+dataBindHierarchy h         = runEffFn2 bindHierarchyFn h
+
+dataBindIndexHierarchy :: ∀ d1 d2 k eff. Hierarchy d2 -> (d2 -> k)            -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
+dataBindIndexHierarchy h keyFn  = runEffFn3 bindHierarchyFnK h keyFn
 
 filter  :: ∀ d eff.  Filter d                   -> Selection d -> Eff (d3::D3|eff) (Selection d)
 filter (Selector s)       = runEffFn2 filterFn s

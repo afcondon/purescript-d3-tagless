@@ -12,9 +12,9 @@ module D3.Base
   , D3SetWithIndex
   , AttrSetter(..)
   , ClassSetter(..)
-  , DataBind(..)
   , Filter(..)
   , PolyValue(..)
+  , Hierarchy
   , Index
   , Nodes
   , PredicateFn
@@ -29,6 +29,7 @@ import Control.Monad.Eff (Eff)
 import Data.Array ((:))
 import Data.Foldable (foldr, intercalate)
 import Data.Maybe (Maybe(Nothing, Just))
+import Data.Newtype (class Newtype)
 import Prelude (class Show, show, ($), (<>))
 
 -- || FFI for D3
@@ -41,6 +42,9 @@ foreign import data Peers       :: *
 -- the `this` pointer in a callback, DOM element receiving an event
 foreign import data DomElement  :: *
 
+newtype Hierarchy d = Hierarchy { name :: String, children :: Array (Hierarchy d), datum :: d }
+
+derive instance newtypeHierarchy :: Newtype (Hierarchy d) _
 
 type D3Eff a = ∀ e. Eff (d3 :: D3 | e) a
 
@@ -79,13 +83,6 @@ type PredicateB     d   = ∀ eff. (d -> Number -> (Array D3Element) -> D3Elemen
 type PredicateS     d   = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) String)
 type PredicateN     d   = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) Number)
 type D3SetWithIndex d v = ∀ eff. (d -> Index -> Eff (d3::D3|eff) v)
-
--- | ADT used to wrap those polymorphic calls in D3 which take either
---      a value, or...
---      a function to get a value from the datum, or...
---      a function to get a value from the datum and its index
-data DataBind d k = Data (Array d)
-                  | Keyed (Array d) (d -> k)
 
 data PolyValue d v  = Value v
                     | SetByIndex (D3SetWithIndex d v) -- really want to say d OR v is convertible to String - TODO EXPLORE

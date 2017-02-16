@@ -19,10 +19,6 @@ data Callback d b =   Lambda1 (d ->                                  b)
 data D3Transition = SimpleTransition Duration
                   | NamedTransition String Duration
 
-newtype Hierarchy d = Hierarchy { name :: String, children :: Array (Hierarchy d), datum :: d }
-
-derive instance newtypeHierarchy :: Newtype (Hierarchy d) _
-
 data D3ElementType
     =     SvgCircle
         -- | SvgEllipse
@@ -36,6 +32,10 @@ data D3ElementType
         | SvgRect
         | SvgText
         -- | SvgUse
+        | HTMLDiv
+        | HTMLP
+        | HTMLH1
+        | HTMLSpan
 
 -- static evaluation of SVGPathString could be done in dummy interpreter or,
 -- more ambitiously it could be built up using further DSL mechanics
@@ -57,3 +57,7 @@ instance showD3ElementType :: Show D3ElementType where
   show SvgPath   = "path"
   show SvgRect   = "rect"
   show SvgText   = "text"
+  show HTMLDiv   = "div"
+  show HTMLP     = "p"
+  show HTMLH1    = "h1"
+  show HTMLSpan  = "span"

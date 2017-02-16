@@ -2,11 +2,12 @@ module TaglessD3.StringImpl where
 
 import TaglessD3.AttrNew
 import Data.List (List)
+import Data.Maybe (Maybe(..))
 import Data.Monoid (class Monoid)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, pure, show, unit, ($), (<<<), (<>))
-import TaglessD3.Base (D3ElementType, D3Transition, Hierarchy, Selector)
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
+import TaglessD3.Base (D3ElementType, D3Transition, Selector)
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 
 data D3Structure = D3S String (Array (Array String))
@@ -63,8 +64,7 @@ instance selectionDummySelection :: AbstractSelection FakeSelection where
     exit                 = FakeSelection $ exit'
     attrs attributes     = FakeSelection $ attrs' attributes
     transition t         = FakeSelection $ transition' t
-    dataBind (ArrayD ds i)     = FakeSelection $ dataAI' ds i
-    dataBind (HierarchyD ds i) = FakeSelection $ dataHI' ds i
+    dataBind d           = FakeSelection $ dataBind d
 
 d3Select' :: Selector -> SelectionFn Unit
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
@@ -99,17 +99,17 @@ attrs' as d3s = Tuple unit $ d3s ++ [ (renderArrayOfAttributes as) ]
 transition' :: D3Transition -> SelectionFn Unit
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]
 
-dataAI' :: ∀ d i. Array d -> (d -> i) -> SelectionFn Unit
-dataAI' ds index d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
-
-dataHI' :: ∀ d i. Hierarchy d -> (d -> i) -> SelectionFn Unit
-dataHI' hd index d3s = Tuple unit $ d3s ++ ["Hierarchical data with index function"]
+dataBind    :: ∀ d i. D3Data d i -> SelectionFn Unit
+dataBind (ArrayD     ds (Just k)) d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
+dataBind (ArrayD     ds Nothing)  d3s = Tuple unit $ d3s ++ ["Data from Array (no index fn)"]
+dataBind (HierarchyD hs (Just k)) d3s = Tuple unit $ d3s ++ ["Data from Hierarchy with index function"]
+dataBind (HierarchyD ds Nothing)  d3s = Tuple unit $ d3s ++ ["Data from Hierarchy (no index fn)"]
 
 -- the selection being merged is added to our selection, but don't yet
 -- understand how to capture name from merged selection? maybe change f to
 -- different function?
-merge' :: FakeSelection Unit -> SelectionFn String
-merge' (FakeSelection f) (D3S name statements) = Tuple "merged" (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
+merge' :: FakeSelection Unit -> SelectionFn Unit
+merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
 
 
 -- | Utility functions
