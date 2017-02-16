@@ -49,7 +49,7 @@ lp { name, age } =
 
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
-    let s = runD3Monad d3Script Nothing
+    runD3Monad d3Script Nothing
     log "\n\n\n====== cool beans =======\n\n\n"
     let ss = show $ S.runStructure d3Script' mempty
     log ss
