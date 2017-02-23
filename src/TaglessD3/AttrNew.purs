@@ -1,7 +1,9 @@
 module TaglessD3.AttrNew (
       Attr(..)
     , Attr'
-    , D3Attr
+    , D3Attr(..)
+    , D3Selection'
+    , D3Effect
     , attrInt
     , attrIntP
     , attrChar
@@ -23,7 +25,7 @@ type D3Effect = ∀ e. Eff (d3 :: D3 | e) Unit
 
 type D3Selection' = Unit -- dummy definition for now
 data D3Attr a = D3Attr { value :: a
-                       , showValue :: a -> String
+                       , showValue :: a -> String -- this only produces a String, not enough for actually passing to D3
                        , apply :: D3Selection' -> a -> D3Effect
                     }
 type Attr' = Exists D3Attr
@@ -44,27 +46,48 @@ instance showD3Attr :: Show (D3Attr a) where
   show (D3Attr { value, showValue }) = "Attr a: " <> showValue value
 
 instance showAttr :: Show Attr where
-  show (CX a) =  "CX: " <> runExists showOne a
-  show (CY a) =  "CY: " <> runExists showOne a
-  show (R a)  =  "R: " <> runExists showOne a
-  show (X a)  =  "X: " <> runExists showOne a
-  show (Y a)  =  "Y: " <> runExists showOne a
-  show (DX a) =  "DX: " <> runExists showOne a
-  show (DY a) =  "DY: " <> runExists showOne a
-  show (Height a) =  "Height: " <> runExists showOne a
-  show (Width a)  =  "Width: " <> runExists showOne a
-  show (StrokeWidth a)   =  "StrokeWidth: " <> runExists showOne a
-  show (StrokeOpacity a) =  "StrokeOpacity: " <> runExists showOne a
-  show (FillOpacity a)   =  "FillOpacity: " <> runExists showOne a
-  show (Opacity a)       =  "Opacity: " <> runExists showOne a
-  show (D a)  =  "D: " <> runExists showOne a
-  show (Id a) =  "Id: " <> runExists showOne a
-  show (StrokeLineCap a) =  "StrokeLineCap: " <> runExists showOne a
-  show (PatternUnits a)  =  "PatternUnits: " <> runExists showOne a
-  show (Style s a) =  "Style: " <> s <> " " <> runExists showOne a
-  show (Class a)   =  "Class: " <> runExists showOne a
-  show (Text a)    =  "Text: " <> runExists showOne a
-  show (Type a)    =  "Type: " <> runExists showOne a
+  show (CX a)
+    =  "CX: " <> runExists showOne a
+  show (CY a)
+    =  "CY: " <> runExists showOne a
+  show (R a)
+    =  "R: " <> runExists showOne a
+  show (X a)
+    =  "X: " <> runExists showOne a
+  show (Y a)
+    =  "Y: " <> runExists showOne a
+  show (DX a)
+    =  "DX: " <> runExists showOne a
+  show (DY a)
+    =  "DY: " <> runExists showOne a
+  show (Height a)
+    =  "Height: " <> runExists showOne a
+  show (Width a)
+    =  "Width: " <> runExists showOne a
+  show (StrokeWidth a)
+    =  "StrokeWidth: " <> runExists showOne a
+  show (StrokeOpacity a)
+    =  "StrokeOpacity: " <> runExists showOne a
+  show (FillOpacity a)
+    =  "FillOpacity: " <> runExists showOne a
+  show (Opacity a)
+    =  "Opacity: " <> runExists showOne a
+  show (D a)
+    =  "D: " <> runExists showOne a
+  show (Id a)
+    =  "Id: " <> runExists showOne a
+  show (StrokeLineCap a)
+    =  "StrokeLineCap: " <> runExists showOne a
+  show (PatternUnits a)
+    =  "PatternUnits: " <> runExists showOne a
+  show (Style s a)
+    =  "Style: " <> s <> " " <> runExists showOne a
+  show (Class a)
+    =  "Class: " <> runExists showOne a
+  show (Text a)
+    =  "Text: " <> runExists showOne a
+  show (Type a)
+    =  "Type: " <> runExists showOne a
 
 data Attr = CX                  Attr' -- circles only
           | CY                  Attr' -- circles only

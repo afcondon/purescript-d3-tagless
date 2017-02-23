@@ -6,6 +6,7 @@ module D3.Selection
   , d3SelectAll
   , append
   , attr
+  , attr'
   , getAttr   -- getters provided separate because they don't return a Selection
   -- , call   -- TBD
   , call, call1, call2, call3, call4, call5, call6, call7, call8, call9
@@ -120,6 +121,10 @@ getAttr s                    = runEffFn2 getAttrFn  s
 attr :: ∀ d x eff. String -> AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Selection d)
 attr s (SetAttr x)           = runEffFn3 attrFn  s x
 attr s (AttrFn p)            = runEffFn3 attrFnP s (mkEffFn4 p)
+
+attr' :: ∀ d x eff. String -> AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Selection d)
+attr' s (SetAttr x)           = runEffFn3 attrFn  s x
+attr' s (AttrFn p)            = runEffFn3 attrFnP s (mkEffFn4 p)
 
 style  :: ∀ d eff.  String -> PolyValue d String -> Selection d -> Eff (d3::D3|eff) (Selection d)
 style name (Value value)     = runEffFn3 styleFn name value

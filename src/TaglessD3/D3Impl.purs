@@ -9,10 +9,13 @@ import Control.Monad.Eff.Unsafe (unsafeCoerceEff, unsafePerformEff)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
 import Control.Monad.Trans.Class (lift)
+import D3.Base (D3)
+import Data.List (head)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Unit (unit)
+import TaglessD3.AttrNew (D3Attr(..))
 import TaglessD3.Base (D3ElementType, D3Transition, Selector)
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 import Unsafe.Coerce (unsafeCoerce)
@@ -93,19 +96,36 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
      -- attrs is complicated by callbacks and also we'd like to hide the repeated call to attr behind array of attr
     attrs attributes           = do -- TODO
         ms <- get
-        -- put $ (unsafePerformEff <<< D3.attr attributes) <$> ms
         pure unit
+
+-- | here's how Attr is handled in the StringImpl
+-- attrs' :: List Attr -> SelectionFn Unit
+-- attrs' as d3s = Tuple unit $ d3s ++ [ (renderArrayOfAttributes as) ]
+--
+-- renderArrayOfAttributes :: List Attr -> String
+-- renderArrayOfAttributes attrs = intercalate ", " $ foldl go Nil attrs
+--     where
+--     go :: List String -> Attr -> List String
+--     go acc attr = Cons (show attr) acc
 
     transition t               = do -- TODO
         ms <- get
         -- put $ (unsafePerformEff <<< D3.selectionTransition t) <$> ms
         pure unit
 
-    dataBind ds = do
+    dataBind d = do
         ms <- get
-        put $ unsafeCoerce $ case ds of  -- Necessary because Selection value was unknown before this data bind 
-                (ArrayD ds (Just k))       -> (unsafePerformEff <<< (D3.dataBindIndexArray ds k)) <$> ms
-                (ArrayD ds Nothing)        -> (unsafePerformEff <<< (D3.dataBindArray ds))        <$> ms
+        put $ unsafeCoerce $ case d of  -- Necessary because Selection value was unknown before this data bind
+                (ArrayD ds (Just k))       -> (unsafePerformEff <<< (D3.dataBindIndexArray ds k))       <$> ms
+                (ArrayD ds Nothing)        -> (unsafePerformEff <<< (D3.dataBindArray ds))              <$> ms
                 (HierarchyD tree (Just k)) -> (unsafePerformEff <<< (D3.dataBindIndexHierarchy tree k)) <$> ms
                 (HierarchyD tree Nothing)  -> (unsafePerformEff <<< (D3.dataBindHierarchy tree))        <$> ms
         pure unit
+
+
+
+class RunD3 a where
+  runD3 :: ∀ e. a -> Eff (d3 :: D3 | e) Unit
+
+instance rund3D3Attr :: RunD3 (D3Attr a) where
+  runD3 (D3Attr { value, showValue }) = pure unit

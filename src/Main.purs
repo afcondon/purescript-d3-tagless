@@ -42,7 +42,7 @@ type ExData = { name :: String, age :: Int }
 
 lp :: ExData -> Char
 lp { name, age } =
-    case name, age of
+    case name, age of -- silly little function just shows one way you might use an index function (NB in many cases D3 has better solutions for grouping)
     "awn", _ -> 'a'
     _, 0     -> 'b'
     _, _     -> 'c'
