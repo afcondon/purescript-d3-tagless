@@ -5,7 +5,7 @@ import Control.Monad.Eff (Eff)
 import D3.Base (D3)
 import DOM.Event.Types (Event, TouchEvent)
 import DOM.HTML.Types (HTMLElement)
-import Data.Function.Eff (runEffFn3, runEffFn1, EffFn3, EffFn1, EffFn2, runEffFn2)
+import Control.Monad.Eff.Uncurried (runEffFn3, runEffFn1, EffFn3, EffFn1, EffFn2, runEffFn2)
 import Data.Nullable (Nullable)
 import Prelude (Unit)
 

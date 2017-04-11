@@ -1,0 +1,15 @@
+{
+    "name": "purescript-D3-tagless",
+    "set": "psc-0.11.3",
+    "source": "https://github.com/purescript/package-sets.git",
+    "depends": [
+        "profunctor",
+        "colors",
+        "exists",
+        "console",
+        "eff",
+        "prelude",
+        "nullable",
+        "dom"
+    ]
+}

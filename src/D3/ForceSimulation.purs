@@ -1,16 +1,16 @@
 module D3.ForceSimulation where
 
-import Data.Pair
+-- import Data.Pair
 import D3.Base (Index, D3, Eff)
 import D3.Selection (Selection)
-import Data.Function.Eff (EffFn2, EffFn1, EffFn3, runEffFn1, runEffFn2, runEffFn3)
+import Control.Monad.Eff.Uncurried (EffFn2, EffFn1, EffFn3, runEffFn1, runEffFn2, runEffFn3)
 import Data.Function.Uncurried (mkFn2, Fn2)
 import Data.Maybe (Maybe(Nothing, Just))
 import Prelude (Unit)
 
 
-foreign import data D3Simulation :: *
-foreign import data D3Force      :: *
+foreign import data D3Simulation :: Type
+foreign import data D3Force      :: Type
 
 type Node = { id :: String, group :: Number }
 type Link = { source :: String, target :: String, value :: Number }
@@ -31,7 +31,7 @@ foreign import addForceFn          :: ∀ eff. EffFn3 (d3::D3|eff) String D3Forc
 foreign import d3ForceSimulationFn :: ∀ eff. Eff    (d3::D3|eff)                                D3Simulation
 foreign import linkIDFn            :: ∀ v eff. EffFn2 (d3::D3|eff) (Fn2 Node Index v) D3Force      D3Force
 foreign import makeCenterForceFn   :: ∀ eff. Eff    (d3::D3|eff)                                     D3Force
-foreign import makeCenterForceFnP  :: ∀ eff. EffFn2 (d3::D3|eff) Number Number                       D3Force
+foreign import makeCenterForceFnP  :: ∀ eff. EffFn1 (d3::D3|eff) (Array Number)                      D3Force
 foreign import makeLinkForceFn     :: ∀ eff. EffFn1 (d3::D3|eff) (Array Link)                        D3Force
 foreign import makeManyBodyForceFn :: ∀ eff. Eff    (d3::D3|eff)                                     D3Force
 foreign import getLinksFn          :: ∀ eff. EffFn1 (d3::D3|eff) D3Simulation                   (Array Link)
@@ -86,10 +86,12 @@ getLinks      = runEffFn1 getLinksFn
 makeManyBody :: ∀ eff. Eff (d3::D3|eff) D3Force
 makeManyBody = makeManyBodyForceFn
 
--- || functions only for CENTERING force
-makeCenterForce :: ∀ eff. Maybe (Pair Number) -> Eff (d3::D3|eff) D3Force
-makeCenterForce (Just (Pair x y)) = runEffFn2 makeCenterForceFnP x y
-makeCenterForce Nothing           = makeCenterForceFn
+-- || functions only for CENTERING force was using Data.Pair to be a little more
+-- precise but dropped this to get it to compile with psc-package which doesn't
+-- yet have that
+makeCenterForce :: ∀ eff. Maybe (Array Number) -> Eff (d3::D3|eff) D3Force
+makeCenterForce (Just xy) = runEffFn1 makeCenterForceFnP xy
+makeCenterForce Nothing   = makeCenterForceFn
 
 {-
 Simulation API

@@ -25,7 +25,7 @@ module D3.Base
   , opaque
   ) where
 
-import Control.Monad.Eff (Eff)
+import Control.Monad.Eff (Eff, kind Effect)
 import Data.Array ((:))
 import Data.Foldable (foldr, intercalate)
 import Data.Maybe (Maybe(Nothing, Just))
@@ -33,14 +33,14 @@ import Data.Newtype (class Newtype)
 import Prelude (class Show, show, ($), (<>))
 
 -- || FFI for D3
-foreign import data D3 :: !
-foreign import data D3Element :: *
+foreign import data D3 :: Effect
+foreign import data D3Element :: Type
 -- the underlying D3 selection that is passed between calls
-foreign import data D3Selection :: *
+foreign import data D3Selection :: Type
 -- a Selection that's passed back in some callbacks
-foreign import data Peers       :: *
+foreign import data Peers       :: Type
 -- the `this` pointer in a callback, DOM element receiving an event
-foreign import data DomElement  :: *
+foreign import data DomElement  :: Type
 
 newtype Hierarchy d = Hierarchy { name :: String, children :: Array (Hierarchy d), datum :: d }
 

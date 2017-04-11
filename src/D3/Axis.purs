@@ -13,10 +13,10 @@ module D3.Axis
 import D3.Base (D3, Eff)
 import D3.Scale (Scale)
 import D3.Selection (Selection)
-import Data.Function.Eff (runEffFn2, EffFn3, runEffFn3, EffFn2, runEffFn1, EffFn1)
+import Control.Monad.Eff.Uncurried (runEffFn2, EffFn3, runEffFn3, EffFn2, runEffFn1, EffFn1)
 import Data.Maybe (Maybe(Just, Nothing))
 
-foreign import data Axis :: * -> *
+foreign import data Axis :: Type -> Type
 
 foreign import d3AxisTopFn    :: ∀ d r eff. EffFn1 (d3::D3|eff) (Scale d r) (Axis d)
 foreign import d3AxisBottomFn :: ∀ d r eff. EffFn1 (d3::D3|eff) (Scale d r) (Axis d)

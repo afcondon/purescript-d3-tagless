@@ -7,8 +7,8 @@ import D3Impl (runD3Monad)
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
-import Number (divide)
-import Prelude (Unit, bind, ($))
+-- import Number (divide)
+import Prelude (Unit, discard, bind, ($), (/))
 import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
 import TaglessD3.Base (D3ElementType(SvgText, SvgGroup), D3Transition(NamedTransition), Duration(MS))
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, transition)
@@ -30,7 +30,7 @@ myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5] Nothing
 
 myData' :: D3Data Int Number
-myData'      = ArrayD [1,2,3,4,5] (Just \i -> divide (toNumber i) 2.0) -- array data with lambda index fn
+myData'      = ArrayD [1,2,3,4,5] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
 attrList     = attributes $ [ CX $ attrInt 1
@@ -50,7 +50,7 @@ lp { name, age } =
 
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
-    runD3Monad d3Script Nothing
+    _ <- runD3Monad d3Script Nothing
     log "\n\n\n====== cool beans =======\n\n\n"
     -- let ss = show $ S.runStructure d3Script mempty
     -- log ss

@@ -1,14 +1,14 @@
 module D3.Drag where
 
-import Control.Monad.Eff (Eff)
+import Control.Monad.Eff (kind Effect, Eff)
 import D3.Base (D3, D3Element, Typenames, Index, D3Typenames)
 import DOM.Event.Types (Event)
 import Data.Array ((:))
-import Data.Function.Eff (EffFn3, EffFn2, runEffFn2, runEffFn3)
+import Control.Monad.Eff.Uncurried (EffFn3, EffFn2, runEffFn2, runEffFn3)
 import Data.Nullable (Nullable)
 import Prelude (Unit, show)
 
-foreign import data Drag :: * -> *
+foreign import data Drag :: Type -> Type
 
 foreign import d3DragFn :: ∀ d eff. Eff (d3::D3|eff) (Drag d)
 
@@ -55,7 +55,7 @@ foreign import addListenerFn     :: ∀ d eff. EffFn3 (d3::D3|eff) D3Typenames
                                                                 (Drag d)
                                                                 (Drag d)
 
-foreign import data EffFn3PlusThis :: # ! -> * -> * -> * -> * -> *    -- JS call with three params
+foreign import data EffFn3PlusThis :: # Effect -> Type -> Type -> Type -> Type -> Type    -- JS call with three params
 foreign import mkEffFn4Special :: forall eff d r.
                                         (d -> Index -> Array D3Element -> D3Element -> Eff eff r) -- callback has 4 params
                                         -> EffFn3PlusThis eff d Index (Array D3Element) Unit      -- JS calls with 3 params + this
@@ -120,7 +120,7 @@ dragUpdate = runEffFn2 dragUpdateFn
 
 type AccessorFn d = ∀ eff. (d -> Eff (d3::D3|eff) Unit)
 
-foreign import data Subject :: *
+foreign import data Subject :: Type
 
 -- data SubjectOpts d = GetAccessor
 --                    | SetAccessorFn (d -> ?)

@@ -2,13 +2,13 @@ module D3.Tree where
 
 import Prelude
 import D3.Base (D3, Eff)
-import Data.Function.Eff (mkEffFn2, EffFn1, runEffFn1, runEffFn2, EffFn2)
+import Control.Monad.Eff.Uncurried (mkEffFn2, EffFn1, runEffFn1, runEffFn2, EffFn2)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
 
 
-foreign import data D3Tree           :: *
-foreign import data D3Hierarchy      :: *
+foreign import data D3Tree           :: Type
+foreign import data D3Hierarchy      :: Type
 
 type HierarchyLink d = { source :: (HierarchyNode d), target :: (HierarchyNode d) }
 type HierarchyNode d = {

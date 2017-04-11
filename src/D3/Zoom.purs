@@ -13,10 +13,10 @@ module D3.Zoom (
 import D3.Base (D3Element, D3Typenames, D3, Eff, Typenames)
 import D3.Drag (EffFn3PlusThis, DragListener, mkEffFn4Special)
 import DOM.Event.Types (Event)
-import Data.Function.Eff (EffFn2, EffFn3, runEffFn2, runEffFn3)
+import Control.Monad.Eff.Uncurried (EffFn2, EffFn3, runEffFn2, runEffFn3)
 import Prelude (Unit, show)
 
-foreign import data Zoom :: *
+foreign import data Zoom :: Type
 
 type Extent = Array Number -- of `length` 2, just the min and max zoom
 

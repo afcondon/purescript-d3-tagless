@@ -27,16 +27,16 @@ module D3.Scale
 import Control.Monad.Eff (Eff)
 import D3.Base (D3)
 import D3.Collections
-import Data.Function.Eff (runEffFn2, runEffFn3, runEffFn1, EffFn2, EffFn3, EffFn1)
+import Control.Monad.Eff.Uncurried (runEffFn2, runEffFn3, runEffFn1, EffFn2, EffFn3, EffFn1)
 import Data.Maybe (Maybe(..))
 
-foreign import data Scale :: * -> * -> *
+foreign import data Scale :: Type -> Type -> Type
 
 type Interpolator = (Number -> String)
 type Format       = String
 
 -- | This belongs in d3-scale-chromatic here just for now, to be broken out later
-foreign import data SchemeCategory :: *       -- in practice it's just a string, i think
+foreign import data SchemeCategory :: Type       -- in practice it's just a string, i think
 foreign import schemeCategory10  :: SchemeCategory
 foreign import schemeCategory20  :: SchemeCategory
 foreign import schemeCategory20b :: SchemeCategory

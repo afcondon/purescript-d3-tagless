@@ -23,9 +23,9 @@ module D3.Collections.Map
 import Prelude
 import Control.Monad.Eff (Eff)
 import D3.Base (D3)
-import Data.Function.Eff (EffFn2, EffFn1, runEffFn1, runEffFn2)
+import Control.Monad.Eff.Uncurried (EffFn2, EffFn1, runEffFn1, runEffFn2)
 
-foreign import data D3Map :: * -> *
+foreign import data D3Map :: Type -> Type
 
 type D3MapKey     = String
 -- type D3MapValue   = Void -- d3Maps can have varying types in one map

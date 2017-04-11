@@ -40,12 +40,12 @@ module D3.Transitions
 import D3.Base (D3Element, D3, Eff, Filter(..), PolyValue(..))
 import D3.Interpolator (Time, D3TweenFn, D3TweenTarget, Index)
 import D3.Selection (Selection)
-import Data.Function.Eff (mkEffFn2, mkEffFn3, EffFn3, EffFn2, EffFn1, runEffFn3, runEffFn2, runEffFn1)
+import Control.Monad.Eff.Uncurried (mkEffFn2, mkEffFn3, EffFn3, EffFn2, EffFn1, runEffFn3, runEffFn2, runEffFn1)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
 import Prelude (($), (<$>))
 
-foreign import data Transition :: * -> *
+foreign import data Transition :: Type -> Type
 
 foreign import d3TransitionFn    :: ∀ d eff.   EffFn1 (d3::D3|eff) String                                     (Transition d)
 foreign import d3TransitionFn2   :: ∀ d eff.                                                 Eff (d3::D3|eff) (Transition d)

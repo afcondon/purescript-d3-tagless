@@ -34,15 +34,15 @@ module D3.Selection
   , text
   ) where
 
-import Control.Monad.Eff (Eff)
+import Control.Monad.Eff (kind Effect, Eff)
 import D3.Base (AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
 import DOM.Event.Types (EventType)
-import Data.Function.Eff (EffFn5, EffFn3, EffFn2, EffFn4, EffFn1, runEffFn5, runEffFn3, runEffFn2, runEffFn1, mkEffFn2, mkEffFn4)
+import Control.Monad.Eff.Uncurried (EffFn5, EffFn3, EffFn2, EffFn4, EffFn1, runEffFn5, runEffFn3, runEffFn2, runEffFn1, mkEffFn2, mkEffFn4)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
 import Prelude (Unit, ($), (<$>))
 
-foreign import data Selection :: * -> *
+foreign import data Selection :: Type -> Type
 
 -- missing SelectFnFn which takes a predicate fn to perform the selection
 foreign import appendFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
@@ -283,8 +283,8 @@ type CallbackParamP d p =
     , alt       :: Boolean
   }
 
-foreign import data D3EffCallback      :: # ! -> * -> * -> *
-foreign import data D3EffCallbackP     :: # ! -> * -> * -> * -> *
+foreign import data D3EffCallback      :: # Effect -> Type -> Type -> Type
+foreign import data D3EffCallbackP     :: # Effect -> Type -> Type -> Type -> Type
 foreign import      mkCallback         :: ∀ eff d r.   (CallbackParam d -> Eff eff r)
   -> D3EffCallback eff (CallbackParam d) r
 foreign import      mkCallbackWithProp :: ∀ eff d p r. (CallbackParamP d p -> Eff eff r) -> PropertyName
