@@ -10,6 +10,7 @@ exports.d3SelectAllFn = function (selector)              {
     return d3.selectAll(selector); }
 
 exports.appendFn    = function (tag, selection)          {
+    console.log(selection);
     console.log("append");
     return selection.append(tag); }
 

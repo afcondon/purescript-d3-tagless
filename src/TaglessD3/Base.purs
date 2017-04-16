@@ -52,7 +52,7 @@ instance showD3Transition :: Show D3Transition where
 
 instance showD3ElementType :: Show D3ElementType where
   show SvgCircle = "circle"
-  show SvgGroup  = "group"
+  show SvgGroup  = "g"
   show SvgImage  = "image"
   show SvgPath   = "path"
   show SvgRect   = "rect"

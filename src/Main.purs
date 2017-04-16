@@ -11,17 +11,18 @@ import Data.Maybe (Maybe(..))
 import Prelude (Unit, discard, bind, ($), (/))
 import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
 import TaglessD3.Base (D3ElementType(SvgText, SvgGroup), D3Transition(NamedTransition), Duration(MS))
-import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, transition)
+import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, selectAll, dataBind, enter, transition)
 
 d3Script :: ∀ m. (AbstractSelection m) => m Unit
 d3Script = do
     d3Select "#chart"
     append SvgGroup
+    selectAll "text"
     dataBind myData'
     enter
     append SvgText
-    attrs attrList
-    transition myTransition
+    -- attrs attrList
+    -- transition myTransition
 
 myTransition :: D3Transition
 myTransition = NamedTransition "t1" $ MS 500
@@ -30,7 +31,7 @@ myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5] Nothing
 
 myData' :: D3Data Int Number
-myData'      = ArrayD [1,2,3,4,5] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
+myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
 attrList     = attributes $ [ CX $ attrInt 1

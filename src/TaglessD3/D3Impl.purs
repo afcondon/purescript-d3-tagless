@@ -43,55 +43,43 @@ fsState (D3Monad m) = liftA1 snd $ runStateT m Nothing
 
 -- now to fulfill the contract with the abstract definition of D3 Selections
 instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
-    d3Select selector          = do
-        put $ Just $ unsafePerformEff $ D3.d3Select selector
-        pure unit
+    d3Select selector = put $ Just $ unsafePerformEff $ D3.d3Select selector
 
-    d3SelectAll selector       = do
-        put $ Just $ unsafePerformEff $ D3.d3SelectAll selector
-        pure unit
+    d3SelectAll selector = put $ Just $ unsafePerformEff $ D3.d3SelectAll selector
 
-    select selector            = do
+    select selector = do
         ms <- get
         put $ (unsafePerformEff <<< D3.select selector) <$> ms
-        pure unit
 
     selectAll selector         = do
         ms <- get
         put $ (unsafePerformEff <<< D3.selectAll selector) <$> ms
-        pure unit
 
     merge selection            = do
         ms <- get
         let merging = unsafePerformEff $ fsState selection
         let merged = D3.merge <$> merging <*> ms
         put $ unsafePerformEff <$> merged
-        pure unit
 
     insert element             = do
         ms <- get
         put $ (unsafePerformEff <<< D3.insert (show element)) <$> ms
-        pure unit
 
     append element             = do
         ms <- get
         put $ (unsafePerformEff <<< D3.append (show element)) <$> ms
-        pure unit
 
     remove                     = do
         ms <- get
         put $ (unsafePerformEff <<< D3.remove) <$> ms
-        pure unit
 
     enter                      = do
         ms <- get
         put $ (unsafePerformEff <<< D3.enter) <$> ms
-        pure unit
 
     exit                       = do
         ms <- get
         put $ (unsafePerformEff <<< D3.exit) <$> ms
-        pure unit
 
      -- attrs is complicated by callbacks and also we'd like to hide the repeated call to attr behind array of attr
     attrs attributes           = do -- TODO
@@ -111,18 +99,24 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
     transition t               = do -- TODO
         ms <- get
         -- put $ (unsafePerformEff <<< D3.selectionTransition t) <$> ms
-        pure unit
+        pure unit -- TODO
 
-    dataBind d = do
+    -- dataBind :: ∀ d i. D3Data d i -> (m Unit)
+    dataBind (ArrayD ds (Just k)) = do
         ms <- get
-        put $ unsafeCoerce $ case d of  -- Necessary because Selection value was unknown before this data bind
-                (ArrayD ds (Just k))       -> (unsafePerformEff <<< (D3.dataBindIndexArray ds k))       <$> ms
-                (ArrayD ds Nothing)        -> (unsafePerformEff <<< (D3.dataBindArray ds))              <$> ms
-                (HierarchyD tree (Just k)) -> (unsafePerformEff <<< (D3.dataBindIndexHierarchy tree k)) <$> ms
-                (HierarchyD tree Nothing)  -> (unsafePerformEff <<< (D3.dataBindHierarchy tree))        <$> ms
-        pure unit
+        put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindIndexArray ds k)) <$> ms
 
+    dataBind (ArrayD ds Nothing) = do
+        ms <- get
+        put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindArray ds)) <$> ms
 
+    dataBind (HierarchyD ds (Just k)) = do
+        ms <- get
+        put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindIndexHierarchy ds k)) <$> ms
+
+    dataBind (HierarchyD ds Nothing) = do
+        ms <- get
+        put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindHierarchy ds)) <$> ms
 
 class RunD3 a where
   runD3 :: ∀ e. a -> Eff (d3 :: D3 | e) Unit
