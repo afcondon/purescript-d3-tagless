@@ -2,12 +2,11 @@ module Main where
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import D3.Base (D3)
+import D3.Base (D3, D3Element)
 import D3Impl (runD3Monad)
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
--- import Number (divide)
 import Prelude (Unit, discard, bind, ($), (/))
 import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
 import TaglessD3.Base (D3ElementType(SvgText, SvgGroup), D3Transition(NamedTransition), Duration(MS))
@@ -41,8 +40,8 @@ attrList     = attributes $ [ CX $ attrInt 1
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }
 
-lp :: ExData -> Char
-lp { name, age } =
+lp :: ExData -> Number -> Array D3Element -> D3Element -> Char
+lp { name, age } _ _ _ =
     case name, age of -- silly little function just shows one way you might use an index function (NB in many cases D3 has better solutions for grouping)
     "awn", _ -> 'a'
     _, 0     -> 'b'

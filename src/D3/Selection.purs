@@ -6,6 +6,7 @@ module D3.Selection
   , d3SelectAll
   , append
   , attr
+  , listOfAttr
   , getAttr   -- getters provided separate because they don't return a Selection
   -- , call   -- TBD
   , call, call1, call2, call3, call4, call5, call6, call7, call8, call9
@@ -42,6 +43,7 @@ import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (Unit, pure, ($), (<$>))
+import TaglessD3.AttrNew (Attr)
 
 foreign import data Selection :: Type -> Type
 
@@ -123,13 +125,13 @@ classed s (SetSome p)        = runEffFn3 classedFnP s (mkEffFn4 p)
 getAttr :: ∀ v d eff. String                       -> Selection d -> Eff (d3::D3|eff) v
 getAttr s                    = runEffFn2 getAttrFn  s
 
-attr :: ∀ d x eff. String -> AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Selection d)
-attr s (SetAttr x)           = runEffFn3 attrFn  s x
-attr s (AttrFn p)            = runEffFn3 attrFnP s (mkEffFn4 p)
+attr :: ∀ d x eff. AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Selection d)
+attr (SetAttr s x)           = runEffFn3 attrFn  s x
+attr (AttrFn s p)            = runEffFn3 attrFnP s (mkEffFn4 p)
 
-listOfAttr :: ∀ eff d v. List (Tuple String (AttrSetter d v)) -> Selection d -> Eff (d3::D3|eff) (Selection d)
+listOfAttr :: ∀ eff d v. List Attr -> Selection d -> Eff (d3::D3|eff) (Selection d)
 listOfAttr Nil s = pure s
-listOfAttr (a:as) s = attr (fst a) (snd a) s
+listOfAttr (a:as) s = pure s -- now just get the value out of each of these Attr using runExists and call foreign function
 
 style  :: ∀ d eff.  String -> PolyValue d String -> Selection d -> Eff (d3::D3|eff) (Selection d)
 style name (Value value)     = runEffFn3 styleFn name value

@@ -84,7 +84,7 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
      -- attrs is complicated by callbacks and also we'd like to hide the repeated call to attr behind array of attr
     attrs attributes           = do -- TODO
         ms <- get
-        pure unit
+        put $ (unsafePerformEff <<< D3.listOfAttr attributes) <$> ms
 
 -- | here's how Attr is handled in the StringImpl
 -- attrs' :: List Attr -> SelectionFn Unit

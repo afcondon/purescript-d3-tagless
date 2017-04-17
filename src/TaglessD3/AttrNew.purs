@@ -15,7 +15,7 @@ module TaglessD3.AttrNew (
     )where
 
 import Control.Monad.Eff (Eff)
-import D3.Base (D3)
+import D3.Base (D3, D3Element)
 import Data.Exists (Exists, mkExists, runExists)
 import Data.Foldable (class Foldable)
 import Data.List (List(..), foldl, fromFoldable, intercalate)
@@ -128,14 +128,13 @@ attrChar c = mkExists (D3Attr { value: c, showValue: show, apply: dummyD3Op })
 attrString :: String -> Attr'
 attrString s = mkExists (D3Attr { value: s, showValue: show, apply: dummyD3Op })
 
--- now constructors for Attributes that are indirect - take a callback from another type
-attrIntP :: ∀ d. (d -> Int) -> Attr'
+attrIntP :: ∀ d. (d -> Number -> Array D3Element -> D3Element -> Int) -> Attr'
 attrIntP fi = mkExists (D3Attr { value: fi, showValue: const "(function)", apply: dummyD3Op })
 
-attrCharP :: ∀ d. (d -> Char) -> Attr'
+attrCharP :: ∀ d. (d -> Number -> Array D3Element -> D3Element -> Char) -> Attr'
 attrCharP fc = mkExists (D3Attr { value: fc, showValue: const "(function)", apply: dummyD3Op })
 
-attrStringP :: ∀ d. (d -> String) -> Attr'
+attrStringP :: ∀ d. (d -> Number -> Array D3Element -> D3Element -> String) -> Attr'
 attrStringP fs = mkExists (D3Attr { value: fs, showValue: const "(function)", apply: dummyD3Op })
 
 showAll :: List Attr' -> List String
