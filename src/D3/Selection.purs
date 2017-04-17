@@ -6,7 +6,6 @@ module D3.Selection
   , d3SelectAll
   , append
   , attr
-  , attr'
   , getAttr   -- getters provided separate because they don't return a Selection
   -- , call   -- TBD
   , call, call1, call2, call3, call4, call5, call6, call7, call8, call9
@@ -35,23 +34,23 @@ module D3.Selection
   ) where
 
 import Control.Monad.Eff (kind Effect, Eff)
-import D3.Base (AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
-import DOM.Event.Types (EventType)
 import Control.Monad.Eff.Uncurried (EffFn5, EffFn3, EffFn2, EffFn4, EffFn1, runEffFn5, runEffFn3, runEffFn2, runEffFn1, mkEffFn2, mkEffFn4)
+import D3.Base (AttrSetter, AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
+import DOM.Event.Types (EventType)
+import Data.List (List(..), (:))
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
-import Prelude (Unit, ($), (<$>))
+import Data.Tuple (Tuple(..), fst, snd)
+import Prelude (Unit, pure, ($), (<$>))
 
 foreign import data Selection :: Type -> Type
 
 -- missing SelectFnFn which takes a predicate fn to perform the selection
 foreign import appendFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
-foreign import attrFn        :: ∀ d v eff.    EffFn3 (d3::D3|eff) String v                    (Selection d) (Selection d)
 foreign import bindDataFn    :: ∀ d1 d2 eff.  EffFn2 (d3::D3|eff) (Array d2)                  (Selection d1) (Selection d2)
 foreign import bindDataFnK   :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Array d2) (d2 -> k)       (Selection d1) (Selection d2)
 foreign import bindHierarchyFn  :: ∀ d1 d2 eff.   EffFn2 (d3::D3|eff) (Hierarchy d2)          (Selection d1) (Selection d2)
 foreign import bindHierarchyFnK :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Hierarchy d2) (d2 -> k) (Selection d1) (Selection d2)
-foreign import classedFn     :: ∀ d eff.      EffFn3 (d3::D3|eff) String Boolean              (Selection d) (Selection d)
 foreign import d3SelectAllFn :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                    (Selection d)
 foreign import d3SelectFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                    (Selection d)
 foreign import emptyFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) Boolean
@@ -70,45 +69,51 @@ foreign import selectAllFn   :: ∀ d eff.      EffFn2 (d3::D3|eff) String      
 foreign import selectElFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) D3Element                                 (Selection d) -- is this really in D3? TODO
 foreign import selectFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
 foreign import sizeFn        :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) Int
-foreign import styleFn       :: ∀ d v eff.    EffFn3 (d3::D3|eff) String v                    (Selection d) (Selection d)
-foreign import textFn        :: ∀ d v eff.    EffFn2 (d3::D3|eff) v                           (Selection d) (Selection d)
 
--- could use some type defs to help tame these sigs TODO
-foreign import classedFnP    :: ∀ d eff.      EffFn3 (d3::D3|eff)         -- eff
-                                                     String               -- 1st arg of classedFnP
-                                                    (EffFn4 (d3::D3|eff)  -- 2nd arg is itself a callback in EffFn4
-                                                             d                 -- 1st arg of callback
-                                                             Number            -- 2nd arg of callback
-                                                             (Array D3Element) -- 3rd arg of callback
-                                                             D3Element         -- 4th arg of callback
-                                                             Boolean)          -- result of callback
-                                                    (Selection d)             -- 3rd arg
-                                                    (Selection d)             -- result
+type D3CallbackDINE eff d r = (EffFn4 (d3::D3|eff)     -- eff
+                                   d                 -- 1st arg of callback
+                                   Number            -- 2nd arg of callback
+                                   (Array D3Element) -- 3rd arg of callback
+                                   D3Element         -- 4th arg of callback
+                                   r)                -- result of callback
 
-foreign import attrFnP       :: ∀ d x eff.    EffFn3 (d3::D3|eff)        -- eff of attrFnP
-                                                     String              -- 1st arg of attrFnP
-                                                     (EffFn4 (d3::D3|eff)       -- eff of callback (callback is 2nd arg of fn)
-                                                              d                 -- 1st arg of callback
-                                                              Number            -- 2nd arg of callback
-                                                              (Array D3Element) -- 3rd arg of callback
-                                                              D3Element         -- 4th arg of callback
-                                                              x)                -- result of callback, what the attr is to be set to
-                                                     (Selection d)          -- 3rd arg of attrFnP
-                                                     (Selection d)          -- result of attrFnP
+type D3CallbackText v eff = (EffFn2 (d3::D3|eff)    -- eff
+                                      v              -- 1st arg of callback
+                                      Index          -- 2nd arg of callback
+                                      String)        -- result of callback, a style
 
-foreign import styleFnFn     :: ∀ d v eff. EffFn3 (d3::D3|eff)
-                                                     String
-                                                     (EffFn2 (d3::D3|eff)       -- eff
-                                                              v                 -- 1st arg of callback
-                                                              Index             -- 2nd arg of callback
-                                                              String)           -- result of callback, a style
-                                                     (Selection d)
-                                                     (Selection d)
 
-foreign import textFnFn      :: ∀ d v eff. EffFn2 (d3::D3|eff)
-                                                     (EffFn2 (d3::D3|eff) v Index String) -- produces a String for text of element
-                                                     (Selection d)
-                                                     (Selection d)
+-- these foreign functions come in two flavors, simple versions and callback versions
+foreign import classedFn  :: ∀ d eff. EffFn3 (d3::D3|eff) String Boolean (Selection d) (Selection d)
+foreign import classedFnP :: ∀ d eff. EffFn3 (d3::D3|eff)         -- eff
+                                             String               -- 1st arg of classedFnP
+                                            (D3CallbackDINE eff d Boolean)  -- 2nd arg is callback
+                                            (Selection d)             -- 3rd arg
+                                            (Selection d)             -- result
+
+
+foreign import attrFn  :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
+foreign import attrFnP :: ∀ d v eff. EffFn3 (d3::D3|eff)        -- eff of attrFnP
+                                             String              -- 1st arg of attrFnP
+                                             (D3CallbackDINE eff d v)   -- 2nd arg is callback
+                                             (Selection d)          -- 3rd arg of attrFnP
+                                             (Selection d)          -- result of attrFnP
+
+-- foreign import listOfAttrFn :: ∀ d v eff. EffFnX (d3::D3|eff)
+--                                                  (Array )
+
+foreign import styleFn   :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
+foreign import styleFnFn :: ∀ d v eff. EffFn3 (d3::D3|eff)
+                                             String
+                                             (D3CallbackText v eff) -- a callback which will give us a style
+                                             (Selection d)
+                                             (Selection d)
+
+foreign import textFn   :: ∀ d v eff. EffFn2 (d3::D3|eff) v (Selection d) (Selection d)
+foreign import textFnFn :: ∀ d v eff. EffFn2 (d3::D3|eff)
+                                             (D3CallbackText v eff) -- produces a String for text of element
+                                             (Selection d)
+                                             (Selection d)
 
 classed :: ∀ d eff. String -> ClassSetter d    -> Selection d -> Eff (d3::D3|eff) (Selection d)
 classed s (SetAll b)         = runEffFn3 classedFn  s b
@@ -122,9 +127,9 @@ attr :: ∀ d x eff. String -> AttrSetter d x      -> Selection d -> Eff (d3::D3
 attr s (SetAttr x)           = runEffFn3 attrFn  s x
 attr s (AttrFn p)            = runEffFn3 attrFnP s (mkEffFn4 p)
 
-attr' :: ∀ d x eff. String -> AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Selection d)
-attr' s (SetAttr x)           = runEffFn3 attrFn  s x
-attr' s (AttrFn p)            = runEffFn3 attrFnP s (mkEffFn4 p)
+listOfAttr :: ∀ eff d v. List (Tuple String (AttrSetter d v)) -> Selection d -> Eff (d3::D3|eff) (Selection d)
+listOfAttr Nil s = pure s
+listOfAttr (a:as) s = attr (fst a) (snd a) s
 
 style  :: ∀ d eff.  String -> PolyValue d String -> Selection d -> Eff (d3::D3|eff) (Selection d)
 style name (Value value)     = runEffFn3 styleFn name value

@@ -21,7 +21,7 @@ d3Script = do
     dataBind myData'
     enter
     append SvgText
-    -- attrs attrList
+    attrs attrList
     -- transition myTransition
 
 myTransition :: D3Transition
