@@ -34,16 +34,15 @@ module D3.Selection
   , text
   ) where
 
-import Control.Monad.Eff (kind Effect, Eff)
+import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Uncurried (EffFn5, EffFn3, EffFn2, EffFn4, EffFn1, runEffFn5, runEffFn3, runEffFn2, runEffFn1, mkEffFn2, mkEffFn4)
-import D3.Base (AttrSetter, AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
+import D3.Base (AttrSetter(AttrFn, SetAttr), ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
 import DOM.Event.Types (EventType)
-import Data.List (List(..), (:))
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
-import Data.Tuple (Tuple(..), fst, snd)
-import Prelude (Unit, pure, ($), (<$>))
-import TaglessD3.AttrNew (Attr)
+import Data.Traversable (traverse)
+import Prelude (Unit, bind, pure, (<$>))
+import TaglessD3.AttrNew (Attr, getTag)
 
 foreign import data Selection :: Type -> Type
 
@@ -101,9 +100,6 @@ foreign import attrFnP :: ∀ d v eff. EffFn3 (d3::D3|eff)        -- eff of attr
                                              (Selection d)          -- 3rd arg of attrFnP
                                              (Selection d)          -- result of attrFnP
 
--- foreign import listOfAttrFn :: ∀ d v eff. EffFnX (d3::D3|eff)
---                                                  (Array )
-
 foreign import styleFn   :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
 foreign import styleFnFn :: ∀ d v eff. EffFn3 (d3::D3|eff)
                                              String
@@ -129,9 +125,18 @@ attr :: ∀ d x eff. AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Sel
 attr (SetAttr s x)           = runEffFn3 attrFn  s x
 attr (AttrFn s p)            = runEffFn3 attrFnP s (mkEffFn4 p)
 
-listOfAttr :: ∀ eff d v. List Attr -> Selection d -> Eff (d3::D3|eff) (Selection d)
-listOfAttr Nil s = pure s
-listOfAttr (a:as) s = pure s -- now just get the value out of each of these Attr using runExists and call foreign function
+-- traverse :: forall a b m. Applicative m => (a -> m b) -> t a -> m (t b)
+-- runEffFn3 attrFnNew tag val
+
+listOfAttr :: ∀ eff d. Array Attr -> Selection d -> Eff (d3::D3|eff) (Selection d)
+-- listOfAttr Nil s = pure s
+listOfAttr as s = do
+    _ <- arrayOfSelections
+    pure s
+    where
+        arrayOfSelections = traverse (applyAttr s) as
+        applyAttr :: Attr -> Eff (d3::D3|eff) (Selection d)
+        applyAttr a = runEffFn3 attrFn (getTag a) a s
 
 style  :: ∀ d eff.  String -> PolyValue d String -> Selection d -> Eff (d3::D3|eff) (Selection d)
 style name (Value value)     = runEffFn3 styleFn name value
@@ -164,7 +169,7 @@ dataBindArray d         = runEffFn2 bindDataFn d
 dataBindIndexArray :: ∀ d1 d2 k eff. Array d2 -> (d2 -> k) -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
 dataBindIndexArray d keyFn   = runEffFn3 bindDataFnK d keyFn
 
-dataBindHierarchy :: ∀ d1 d2 k eff. Hierarchy d2           -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
+dataBindHierarchy :: ∀ d1 d2 eff. Hierarchy d2           -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
 dataBindHierarchy h         = runEffFn2 bindHierarchyFn h
 
 dataBindIndexHierarchy :: ∀ d1 d2 k eff. Hierarchy d2 -> (d2 -> k)            -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)

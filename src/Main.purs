@@ -8,7 +8,7 @@ import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Prelude (Unit, discard, bind, ($), (/))
-import TaglessD3.AttrNew (Attr(..), attrCharP, attrInt, attrString, attributes)
+import TaglessD3.AttrNew (Attr(..), attrFunction, attrValue, attributes)
 import TaglessD3.Base (D3ElementType(SvgText, SvgGroup), D3Transition(NamedTransition), Duration(MS))
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, selectAll, dataBind, enter, transition)
 
@@ -33,9 +33,9 @@ myData' :: D3Data Int Number
 myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
-attrList     = attributes $ [ CX $ attrInt 1
-                            , Style "width" $ attrString "48%"
-                            , Style "height" $ attrCharP lp ] -- shows callback but also demos like of typecheck on selection...
+attrList     = attributes $ [ CX $ attrValue 1
+                            , Style "width" $ attrValue "48%"
+                            , Style "height" $ attrFunction lp ] -- shows callback but also demos like of typecheck on selection...
 
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }

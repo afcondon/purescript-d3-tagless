@@ -4,19 +4,13 @@ import Prelude
 import D3.Selection as D3
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (class MonadEff)
-import Control.Monad.Eff.Exception (EXCEPTION)
-import Control.Monad.Eff.Unsafe (unsafeCoerceEff, unsafePerformEff)
+import Control.Monad.Eff.Unsafe (unsafePerformEff)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
-import Control.Monad.Trans.Class (lift)
 import D3.Base (D3)
-import Data.List (head)
 import Data.Maybe (Maybe(..))
-import Data.Newtype (class Newtype)
-import Data.Tuple (Tuple(..), fst, snd)
-import Data.Unit (unit)
-import TaglessD3.AttrNew (D3Attr(..))
-import TaglessD3.Base (D3ElementType, D3Transition, Selector)
+import Data.Tuple (Tuple, snd)
+import TaglessD3.AttrNew (Attr(..), D3Attr(..))
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -81,20 +75,9 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
         ms <- get
         put $ (unsafePerformEff <<< D3.exit) <$> ms
 
-     -- attrs is complicated by callbacks and also we'd like to hide the repeated call to attr behind array of attr
     attrs attributes           = do -- TODO
         ms <- get
         put $ (unsafePerformEff <<< D3.listOfAttr attributes) <$> ms
-
--- | here's how Attr is handled in the StringImpl
--- attrs' :: List Attr -> SelectionFn Unit
--- attrs' as d3s = Tuple unit $ d3s ++ [ (renderArrayOfAttributes as) ]
---
--- renderArrayOfAttributes :: List Attr -> String
--- renderArrayOfAttributes attrs = intercalate ", " $ foldl go Nil attrs
---     where
---     go :: List String -> Attr -> List String
---     go acc attr = Cons (show attr) acc
 
     transition t               = do -- TODO
         ms <- get
@@ -123,3 +106,29 @@ class RunD3 a where
 
 instance rund3D3Attr :: RunD3 (D3Attr a) where
   runD3 (D3Attr { value, showValue }) = pure unit
+
+
+getTag :: Attr -> String
+getTag a =
+    case a of
+    (CX _)            -> "cx"
+    (CY _)            -> "CY"
+    (R _)             -> "R"
+    (X _)             -> "X"
+    (Y _)             -> "Y"
+    (DX _)            -> "DX"
+    (DY _)            -> "DY"
+    (Height _)        -> "Height"
+    (Width _)         -> "Width"
+    (StrokeWidth _)   -> "StrokeWidth"
+    (StrokeOpacity _) -> "StrokeOpacity"
+    (FillOpacity _)   -> "FillOpacity"
+    (Opacity _)       -> "Opacity"
+    (D _)             -> "D"
+    (Id _)            -> "Id"
+    (StrokeLineCap _) -> "StrokeLineCap"
+    (PatternUnits _)  -> "PatternUnits"
+    (Text _)          -> "Text"
+    (Type _)          -> "Type"
+    (Style _ _)       -> "Style" -- refactor so that different FFI is called TODO
+    (Class _)         -> "Class" -- refactor so that different FFI is called TODO

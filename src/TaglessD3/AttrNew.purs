@@ -4,20 +4,18 @@ module TaglessD3.AttrNew (
     , D3Attr(..)
     , D3Selection'
     , D3Effect
-    , attrInt
-    , attrIntP
-    , attrChar
-    , attrCharP
-    , attrString
-    , attrStringP
+    , attrValue
+    , attrFunction
     , attributes
     , renderArrayOfAttributes
+    , getTag
     )where
 
 import Control.Monad.Eff (Eff)
 import D3.Base (D3, D3Element)
 import Data.Exists (Exists, mkExists, runExists)
 import Data.Foldable (class Foldable)
+import Data.Function.Uncurried (mkFn4)
 import Data.List (List(..), foldl, fromFoldable, intercalate)
 import Prelude (class Show, Unit, const, map, pure, show, unit, ($), (<>))
 
@@ -26,7 +24,6 @@ type D3Effect = ∀ e. Eff (d3 :: D3 | e) Unit
 type D3Selection' = Unit -- dummy definition for now
 data D3Attr a = D3Attr { value :: a
                        , showValue :: a -> String -- this only produces a String, not enough for actually passing to D3
-                       , apply :: D3Selection' -> a -> D3Effect
                     }
 type Attr' = Exists D3Attr
 
@@ -46,48 +43,48 @@ instance showD3Attr :: Show (D3Attr a) where
   show (D3Attr { value, showValue }) = "Attr a: " <> showValue value
 
 instance showAttr :: Show Attr where
-  show (CX a)
-    =  "CX: " <> runExists showOne a
-  show (CY a)
-    =  "CY: " <> runExists showOne a
-  show (R a)
-    =  "R: " <> runExists showOne a
-  show (X a)
-    =  "X: " <> runExists showOne a
-  show (Y a)
-    =  "Y: " <> runExists showOne a
-  show (DX a)
-    =  "DX: " <> runExists showOne a
-  show (DY a)
-    =  "DY: " <> runExists showOne a
-  show (Height a)
-    =  "Height: " <> runExists showOne a
-  show (Width a)
-    =  "Width: " <> runExists showOne a
-  show (StrokeWidth a)
-    =  "StrokeWidth: " <> runExists showOne a
-  show (StrokeOpacity a)
-    =  "StrokeOpacity: " <> runExists showOne a
-  show (FillOpacity a)
-    =  "FillOpacity: " <> runExists showOne a
-  show (Opacity a)
-    =  "Opacity: " <> runExists showOne a
-  show (D a)
-    =  "D: " <> runExists showOne a
-  show (Id a)
-    =  "Id: " <> runExists showOne a
-  show (StrokeLineCap a)
-    =  "StrokeLineCap: " <> runExists showOne a
-  show (PatternUnits a)
-    =  "PatternUnits: " <> runExists showOne a
-  show (Style s a)
-    =  "Style: " <> s <> " " <> runExists showOne a
-  show (Class a)
-    =  "Class: " <> runExists showOne a
-  show (Text a)
-    =  "Text: " <> runExists showOne a
-  show (Type a)
-    =  "Type: " <> runExists showOne a
+  show (CX a')
+    =  "CX: " <> runExists showOne a' -- showOne :: ∀ a. D3Attr a -> String
+  show (CY a')
+    =  "CY: " <> runExists showOne a'
+  show (R a')
+    =  "R: " <> runExists showOne a'
+  show (X a')
+    =  "X: " <> runExists showOne a'
+  show (Y a')
+    =  "Y: " <> runExists showOne a'
+  show (DX a')
+    =  "DX: " <> runExists showOne a'
+  show (DY a')
+    =  "DY: " <> runExists showOne a'
+  show (Height a')
+    =  "Height: " <> runExists showOne a'
+  show (Width a')
+    =  "Width: " <> runExists showOne a'
+  show (StrokeWidth a')
+    =  "StrokeWidth: " <> runExists showOne a'
+  show (StrokeOpacity a')
+    =  "StrokeOpacity: " <> runExists showOne a'
+  show (FillOpacity a')
+    =  "FillOpacity: " <> runExists showOne a'
+  show (Opacity a')
+    =  "Opacity: " <> runExists showOne a'
+  show (D a')
+    =  "D: " <> runExists showOne a'
+  show (Id a')
+    =  "Id: " <> runExists showOne a'
+  show (StrokeLineCap a')
+    =  "StrokeLineCap: " <> runExists showOne a'
+  show (PatternUnits a')
+    =  "PatternUnits: " <> runExists showOne a'
+  show (Style s a')
+    =  "Style: " <> s <> " " <> runExists showOne a'
+  show (Class a')
+    =  "Class: " <> runExists showOne a'
+  show (Text a')
+    =  "Text: " <> runExists showOne a'
+  show (Type a')
+    =  "Type: " <> runExists showOne a'
 
 data Attr = CX                  Attr' -- circles only
           | CY                  Attr' -- circles only
@@ -117,28 +114,41 @@ data Attr = CX                  Attr' -- circles only
 attributes :: ∀ f a. (Foldable f) => f a -> List a
 attributes = fromFoldable
 
+-- constructors for attribute values, both values and callback functions
+attrValue :: ∀ a. Show a => a -> Attr'
+attrValue v = mkExists (D3Attr { value: v, showValue: show })
 
--- constructors to make Attributes for primitive types, used as direct value
-attrInt :: Int -> Attr'
-attrInt i = mkExists (D3Attr { value: i, showValue: show, apply: dummyD3Op })
-
-attrChar :: Char -> Attr'
-attrChar c = mkExists (D3Attr { value: c, showValue: show, apply: dummyD3Op })
-
-attrString :: String -> Attr'
-attrString s = mkExists (D3Attr { value: s, showValue: show, apply: dummyD3Op })
-
-attrIntP :: ∀ d. (d -> Number -> Array D3Element -> D3Element -> Int) -> Attr'
-attrIntP fi = mkExists (D3Attr { value: fi, showValue: const "(function)", apply: dummyD3Op })
-
-attrCharP :: ∀ d. (d -> Number -> Array D3Element -> D3Element -> Char) -> Attr'
-attrCharP fc = mkExists (D3Attr { value: fc, showValue: const "(function)", apply: dummyD3Op })
-
-attrStringP :: ∀ d. (d -> Number -> Array D3Element -> D3Element -> String) -> Attr'
-attrStringP fs = mkExists (D3Attr { value: fs, showValue: const "(function)", apply: dummyD3Op })
+attrFunction :: ∀ d r. (d -> Number -> Array D3Element -> D3Element -> r) -> Attr'
+attrFunction f = mkExists (D3Attr { value: mkFn4 f, showValue: const "(function)" })
 
 showAll :: List Attr' -> List String
 showAll = map (runExists showOne)
 
 showOne :: ∀ a. D3Attr a -> String
 showOne (D3Attr ops) = ops.showValue ops.value
+
+
+getTag :: Attr -> String
+getTag a =
+    case a of
+    (CX _)            -> "cx"
+    (CY _)            -> "CY"
+    (R _)             -> "R"
+    (X _)             -> "X"
+    (Y _)             -> "Y"
+    (DX _)            -> "DX"
+    (DY _)            -> "DY"
+    (Height _)        -> "Height"
+    (Width _)         -> "Width"
+    (StrokeWidth _)   -> "StrokeWidth"
+    (StrokeOpacity _) -> "StrokeOpacity"
+    (FillOpacity _)   -> "FillOpacity"
+    (Opacity _)       -> "Opacity"
+    (D _)             -> "D"
+    (Id _)            -> "Id"
+    (StrokeLineCap _) -> "StrokeLineCap"
+    (PatternUnits _)  -> "PatternUnits"
+    (Text _)          -> "Text"
+    (Type _)          -> "Type"
+    (Style _ _)       -> "Style" -- refactor so that different FFI is called TODO
+    (Class _)         -> "Class" -- refactor so that different FFI is called TODO
