@@ -14,11 +14,9 @@ exports.appendFn    = function (tag, selection)          {
     console.log("append");
     return selection.append(tag); }
 
-exports.attrFn      = function (attr, b, selection)      {
-    return selection.attr(attr, b); }
-
-exports.attrFnP     = function (names, fn, selection)    {
-    return selection.attr(names, fn); }
+exports.attrFn      = function (attr, v, selection)      {
+    var value = v.value0.value0.value; // unpacking the Exists record
+    return selection.attr(attr, value); }
 
 exports.bindDataFn  = function (array, selection)        {
     console.log("binding data, no index function");

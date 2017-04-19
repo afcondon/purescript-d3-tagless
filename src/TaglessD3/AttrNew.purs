@@ -27,6 +27,30 @@ data D3Attr a = D3Attr { value :: a
                     }
 type Attr' = Exists D3Attr
 
+data Attr = CX                  Attr' -- circles only
+          | CY                  Attr' -- circles only
+          | R                   Attr' -- circles only
+          | X                   Attr'
+          | Y                   Attr'
+          | DX                  Attr' -- string because it might have units with
+          | DY                  Attr'
+          | Height              Attr'
+          | Width               Attr'
+          | StrokeWidth         Attr'
+          | StrokeOpacity       Attr'
+          | FillOpacity         Attr'
+          | Opacity             Attr'
+          | D                   Attr' -- has to be an SVGPathString
+          | Id                  Attr'
+          | StrokeLineCap       Attr' -- Round | Butt | Square
+          | PatternUnits        Attr' -- userSpaceOnUse | objectBoundingBox
+          | Style        String Attr'
+          | Class               Attr'
+          | Text                Attr'
+          | Type                Attr' -- images only
+        --   | Fill                (ValueOrCallback d Color)
+        --   | Stroke              (ValueOrCallback d Color)
+
 dummyD3Op :: ∀ a. D3Selection' -> a -> D3Effect
 dummyD3Op s a = pure unit
 
@@ -85,31 +109,6 @@ instance showAttr :: Show Attr where
     =  "Text: " <> runExists showOne a'
   show (Type a')
     =  "Type: " <> runExists showOne a'
-
-data Attr = CX                  Attr' -- circles only
-          | CY                  Attr' -- circles only
-          | R                   Attr' -- circles only
-          | X                   Attr'
-          | Y                   Attr'
-          | DX                  Attr' -- string because it might have units with
-          | DY                  Attr'
-          | Height              Attr'
-          | Width               Attr'
-          | StrokeWidth         Attr'
-          | StrokeOpacity       Attr'
-          | FillOpacity         Attr'
-          | Opacity             Attr'
-          | D                   Attr' -- has to be an SVGPathString
-          | Id                  Attr'
-          | StrokeLineCap       Attr' -- Round | Butt | Square
-          | PatternUnits        Attr' -- userSpaceOnUse | objectBoundingBox
-          | Style        String Attr'
-          | Class               Attr'
-          | Text                Attr'
-          | Type                Attr' -- images only
-        --   | Fill                (ValueOrCallback d Color)
-        --   | Stroke              (ValueOrCallback d Color)
-
 
 attributes :: ∀ f a. (Foldable f) => f a -> List a
 attributes = fromFoldable
