@@ -44,10 +44,11 @@ data Attr = CX                  Attr' -- circles only
           | Id                  Attr'
           | StrokeLineCap       Attr' -- Round | Butt | Square
           | PatternUnits        Attr' -- userSpaceOnUse | objectBoundingBox
-          | Style        String Attr'
-          | Class               Attr'
           | Text                Attr'
           | Type                Attr' -- images only
+          | Style        String Attr'
+          | Class               Attr'
+          | Property     String Attr'
         --   | Fill                (ValueOrCallback d Color)
         --   | Stroke              (ValueOrCallback d Color)
 
@@ -101,14 +102,16 @@ instance showAttr :: Show Attr where
     =  "StrokeLineCap: " <> runExists showOne a'
   show (PatternUnits a')
     =  "PatternUnits: " <> runExists showOne a'
-  show (Style s a')
-    =  "Style: " <> s <> " " <> runExists showOne a'
-  show (Class a')
-    =  "Class: " <> runExists showOne a'
   show (Text a')
     =  "Text: " <> runExists showOne a'
   show (Type a')
     =  "Type: " <> runExists showOne a'
+  show (Style s a')
+    =  "Style: " <> s <> " " <> runExists showOne a'
+  show (Class a')
+    =  "Class: " <> runExists showOne a'
+  show (Property s a')
+    =  "Property: " <> s <> " " <> runExists showOne a'
 
 attributes :: ∀ f a. (Foldable f) => f a -> List a
 attributes = fromFoldable
@@ -131,23 +134,24 @@ getTag :: Attr -> String
 getTag a =
     case a of
     (CX _)            -> "cx"
-    (CY _)            -> "CY"
-    (R _)             -> "R"
-    (X _)             -> "X"
-    (Y _)             -> "Y"
-    (DX _)            -> "DX"
-    (DY _)            -> "DY"
-    (Height _)        -> "Height"
-    (Width _)         -> "Width"
-    (StrokeWidth _)   -> "StrokeWidth"
-    (StrokeOpacity _) -> "StrokeOpacity"
-    (FillOpacity _)   -> "FillOpacity"
-    (Opacity _)       -> "Opacity"
-    (D _)             -> "D"
-    (Id _)            -> "Id"
-    (StrokeLineCap _) -> "StrokeLineCap"
-    (PatternUnits _)  -> "PatternUnits"
-    (Text _)          -> "Text"
-    (Type _)          -> "Type"
-    (Style _ _)       -> "Style" -- refactor so that different FFI is called TODO
-    (Class _)         -> "Class" -- refactor so that different FFI is called TODO
+    (CY _)            -> "cy"
+    (R _)             -> "r"
+    (X _)             -> "x"
+    (Y _)             -> "y"
+    (DX _)            -> "dx"
+    (DY _)            -> "dy"
+    (Height _)        -> "height"
+    (Width _)         -> "width"
+    (StrokeWidth _)   -> "strokewidth"
+    (StrokeOpacity _) -> "strokeopacity"
+    (FillOpacity _)   -> "fillopacity"
+    (Opacity _)       -> "opacity"
+    (D _)             -> "d"
+    (Id _)            -> "id"
+    (StrokeLineCap _) -> "strokelinecap"
+    (PatternUnits _)  -> "patternunits"
+    (Text _)          -> "text"
+    (Type _)          -> "type"
+    (Style _ _)       -> "style" -- refactor so that different FFI is called TODO
+    (Class _)         -> "class" -- refactor so that different FFI is called TODO
+    (Property _ _)    -> "property" -- refactor so that different FFI is called TODO

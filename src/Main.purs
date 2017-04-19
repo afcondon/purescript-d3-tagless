@@ -9,7 +9,7 @@ import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Prelude (Unit, discard, bind, ($), (/))
 import TaglessD3.AttrNew (Attr(..), attrFunction, attrValue, attributes)
-import TaglessD3.Base (D3ElementType(SvgText, SvgGroup), D3Transition(NamedTransition), Duration(MS))
+import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup), D3Transition(NamedTransition), Duration(MS))
 import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, selectAll, dataBind, enter, transition)
 
 d3Script :: ∀ m. (AbstractSelection m) => m Unit
@@ -19,7 +19,7 @@ d3Script = do
     selectAll "text"
     dataBind myData'
     enter
-    append SvgText
+    append SvgCircle
     attrs attrList
     -- transition myTransition
 
@@ -33,8 +33,9 @@ myData' :: D3Data Int Number
 myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
-attrList     = attributes $ [ CX $ attrValue 1
-                            , Text $ attrValue "foo" ]
+attrList     = attributes $ [ CX $ attrValue 20
+                            , CY $ attrValue 20
+                            , R  $ attrValue 20 ]
                             -- , Style "width" $ attrValue "48%"
                             -- , Style "height" $ attrFunction lp ] -- shows callback but also demos like of typecheck on selection...
 

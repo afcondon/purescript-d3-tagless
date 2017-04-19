@@ -42,7 +42,7 @@ import Data.List (List(..), foldM)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
 import Prelude (Unit, bind, pure, (<$>))
-import TaglessD3.AttrNew (Attr, getTag)
+import TaglessD3.AttrNew (Attr(..), getTag)
 
 foreign import data Selection :: Type -> Type
 
@@ -133,7 +133,10 @@ listOfAttr as s = do
     where
         arrayOfSelections = foldM applyAttr s as
         applyAttr :: Selection d -> Attr -> Eff (d3::D3|eff) (Selection d)
-        applyAttr sel at = runEffFn3 attrFn (getTag at) at sel
+        applyAttr sel at =
+            case at of
+            (Style stylename _) -> runEffFn3 styleFn stylename at sel -- now remember that you have to handle this in the FFI now as for attrFn
+            _ ->  runEffFn3 attrFn (getTag at) at sel
 
 style  :: ∀ d eff.  String -> PolyValue d String -> Selection d -> Eff (d3::D3|eff) (Selection d)
 style name (Value value)     = runEffFn3 styleFn name value

@@ -106,29 +106,3 @@ class RunD3 a where
 
 instance rund3D3Attr :: RunD3 (D3Attr a) where
   runD3 (D3Attr { value, showValue }) = pure unit
-
-
-getTag :: Attr -> String
-getTag a =
-    case a of
-    (CX _)            -> "cx"
-    (CY _)            -> "CY"
-    (R _)             -> "R"
-    (X _)             -> "X"
-    (Y _)             -> "Y"
-    (DX _)            -> "DX"
-    (DY _)            -> "DY"
-    (Height _)        -> "Height"
-    (Width _)         -> "Width"
-    (StrokeWidth _)   -> "StrokeWidth"
-    (StrokeOpacity _) -> "StrokeOpacity"
-    (FillOpacity _)   -> "FillOpacity"
-    (Opacity _)       -> "Opacity"
-    (D _)             -> "D"
-    (Id _)            -> "Id"
-    (StrokeLineCap _) -> "StrokeLineCap"
-    (PatternUnits _)  -> "PatternUnits"
-    (Text _)          -> "Text"
-    (Type _)          -> "Type"
-    (Style _ _)       -> "Style" -- refactor so that different FFI is called TODO
-    (Class _)         -> "Class" -- refactor so that different FFI is called TODO
