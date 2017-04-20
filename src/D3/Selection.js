@@ -15,7 +15,7 @@ exports.appendFn    = function (tag, selection)          {
     return selection.append(tag); }
 
 exports.attrFn      = function (attr, v, selection)      {
-    var value = v.value0.value0.value; // unpacking the Exists record
+    var value = v.value0.value0.value; // unpacking the Exists structure
     return selection.attr(attr, value); }
 
 exports.bindDataFn  = function (array, selection)        {
@@ -88,7 +88,8 @@ exports.sizeFn      = function (selection)               {
     return selection.size(); }
 
 exports.styleFn     = function (key, val, selection)     {
-    return selection.style(key, val); }
+    var value = val.value1.value0.value; // unpacking the Exists structure
+    return selection.style(key, value); }
 
 exports.styleFnFn   = function (key, fn, selection)      {
     return selection.style(key, fn); }

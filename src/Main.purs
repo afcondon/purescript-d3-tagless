@@ -35,9 +35,9 @@ myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array
 attrList :: List Attr
 attrList     = attributes $ [ CX $ attrValue 20
                             , CY $ attrValue 20
-                            , R  $ attrValue 20 ]
-                            -- , Style "width" $ attrValue "48%"
-                            -- , Style "height" $ attrFunction lp ] -- shows callback but also demos like of typecheck on selection...
+                            , R  $ attrValue 20
+                            , Style "width" $ attrValue "48%"
+                            , Style "height" $ attrFunction lp ] -- shows callback but also demos like of typecheck on selection...
 
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }
