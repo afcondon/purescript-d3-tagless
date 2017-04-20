@@ -1,4 +1,4 @@
-module D3Impl where
+module TaglessD3.D3Impl where
 
 import Prelude
 import D3.Selection as D3
@@ -10,7 +10,7 @@ import Control.Monad.State.Trans (StateT, get, put, runStateT)
 import D3.Base (D3)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple, snd)
-import TaglessD3.AttrNew (Attr(..), D3Attr(..))
+import TaglessD3.AttrNew (D3Attr(D3Attr))
 import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 import Unsafe.Coerce (unsafeCoerce)
 

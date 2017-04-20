@@ -1,6 +1,7 @@
 module TaglessD3.AttrNew (
       Attr(..)
     , Attr'
+    , AttrSetter
     , D3Attr(..)
     , D3Selection'
     , D3Effect
@@ -9,6 +10,7 @@ module TaglessD3.AttrNew (
     , attributes
     , renderArrayOfAttributes
     , getTag
+    , CssUnit(..)
     )where
 
 import Control.Monad.Eff (Eff)
@@ -24,6 +26,7 @@ type D3Effect = ∀ e. Eff (d3 :: D3 | e) Unit
 type D3Selection' = Unit -- dummy definition for now
 data D3Attr a = D3Attr { value :: a
                        , showValue :: a -> String -- this only produces a String, not enough for actually passing to D3
+                       , units :: String
                     }
 type Attr' = Exists D3Attr
 
@@ -117,11 +120,21 @@ attributes :: ∀ f a. (Foldable f) => f a -> List a
 attributes = fromFoldable
 
 -- constructors for attribute values, both values and callback functions
-attrValue :: ∀ a. Show a => a -> Attr'
-attrValue v = mkExists (D3Attr { value: v, showValue: show })
+type AttrSetter d v = d -> Number -> (Array D3Element) -> D3Element -> v
 
-attrFunction :: ∀ d r. (d -> Number -> Array D3Element -> D3Element -> r) -> Attr'
-attrFunction f = mkExists (D3Attr { value: mkFn4 f, showValue: const "(function)" })
+attrValue :: ∀ a. Show a => a -> Attr'
+attrValue v = mkExists (D3Attr { value: v, showValue: show, units: "" })
+
+data CssUnit = Px | Em | Pc | Rem | None
+instance showCssUnit :: Show CssUnit where
+  show Px = "px"
+  show Em = "em"
+  show Rem = "rem"
+  show Pc = "%"
+  show None = ""
+
+attrFunction :: ∀ d r. CssUnit -> AttrSetter d r -> Attr'
+attrFunction u f = mkExists (D3Attr { value: mkFn4 f, showValue: const "(function)", units: show u })
 
 showAll :: List Attr' -> List String
 showAll = map (runExists showOne)

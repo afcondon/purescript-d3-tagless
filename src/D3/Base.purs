@@ -8,19 +8,11 @@ module D3.Base
   , D3Typenames
   , ListenerType(..)
   , Typenames(..)
-  , Point
-  , D3SetWithIndex
-  , AttrSetter(..)
-  , ClassSetter(..)
   , Filter(..)
-  , PolyValue(..)
+  , Point
   , Hierarchy
   , Index
   , Nodes
-  , PredicateFn
-  , PredicateB
-  , PredicateS
-  , PredicateN
   , transparent
   , opaque
   ) where
@@ -77,23 +69,5 @@ instance isShowTypenames :: Show Typenames where
 foreign import transparent :: String
 foreign import opaque :: String
 
--- for selection.classed and selection.attr:
-type PredicateFn    d x = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) x)
-type PredicateB     d   = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) Boolean)
-type PredicateS     d   = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) String)
-type PredicateN     d   = ∀ eff. (d -> Number -> (Array D3Element) -> D3Element -> Eff (d3::D3|eff) Number)
-type D3SetWithIndex d v = ∀ eff. (d -> Index -> Eff (d3::D3|eff) v)
-
-data PolyValue d v  = Value v
-                    | SetByIndex (D3SetWithIndex d v) -- really want to say d OR v is convertible to String - TODO EXPLORE
-
 data Filter d       = Selector  String
                     | Predicate (d -> Boolean)
-
-data ClassSetter  d = SetAll Boolean
-                    | SetSome (PredicateB d)
-
-data AttrSetter d x = SetAttr String x
-                    | AttrFn  String (PredicateFn d x)   -- rename both data ctor and Type here TODO
-
--- || Why so many of these ADTs - that's really gross and un-mnemonic, must fix TODO

@@ -27,7 +27,7 @@ module D3.Transitions
   , makeSelection
   , tSize
   , tStyle      -- implements D3 transition.style() & D3 transition.styleTween
-  , tText
+  -- , tText
   -- , tween
   ) where
 
@@ -37,7 +37,7 @@ module D3.Transitions
   -- , style
   -- , styleTween
 
-import D3.Base (D3Element, D3, Eff, Filter(..), PolyValue(..))
+import D3.Base (D3Element, D3, Eff, Filter(..))
 import D3.Interpolator (Time, D3TweenFn, D3TweenTarget, Index)
 import D3.Selection (Selection)
 import Control.Monad.Eff.Uncurried (mkEffFn2, mkEffFn3, EffFn3, EffFn2, EffFn1, runEffFn3, runEffFn2, runEffFn1)
@@ -150,9 +150,10 @@ tSelectAll selector           = runEffFn2 selectAllFn selector
 tSelect  :: ∀ d eff.  String                         -> Transition d -> Eff (d3::D3|eff) (Transition d)
 tSelect selector              = runEffFn2 selectFn selector
 
-tText  :: ∀ d v eff.  PolyValue d v                  -> Transition d -> Eff (d3::D3|eff) (Transition d)
-tText       (Value value)     = runEffFn2 textFn value
-tText       (SetByIndex f)    = runEffFn2 textFnFn (mkEffFn2 f)
+-- replace this with same scheme as for Attributes TODO
+-- tText  :: ∀ d v eff.  PolyValue d v                  -> Transition d -> Eff (d3::D3|eff) (Transition d)
+-- tText       (Value value)     = runEffFn2 textFn value
+-- tText       (SetByIndex f)    = runEffFn2 textFnFn (mkEffFn2 f)
 
 
 tAttr :: ∀ d v eff. String -> AttrInterpolator d v  -> Transition d -> Eff (d3::D3|eff) (Transition d)

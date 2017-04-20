@@ -5,12 +5,10 @@ module D3.Selection
   , d3Select
   , d3SelectAll
   , append
-  -- , attr
   , listOfAttr
   , getAttr   -- getters provided separate because they don't return a Selection
   -- , call   -- TBD
   , call, call1, call2, call3, call4, call5, call6, call7, call8, call9
-  , classed
   , dataBindArray
   , dataBindIndexArray
   , dataBindHierarchy
@@ -30,13 +28,11 @@ module D3.Selection
   , selectAll
   , selectElem
   , size
-  , style
-  , text
   ) where
 
 import Control.Monad.Eff (Eff, kind Effect)
-import Control.Monad.Eff.Uncurried (EffFn5, EffFn3, EffFn2, EffFn4, EffFn1, runEffFn5, runEffFn3, runEffFn2, runEffFn1, mkEffFn2, mkEffFn4)
-import D3.Base (ClassSetter(SetSome, SetAll), D3, D3Element, Filter(Predicate, Selector), Hierarchy, Index, PolyValue(SetByIndex, Value))
+import Control.Monad.Eff.Uncurried (EffFn1, EffFn2, EffFn3, EffFn4, EffFn5, runEffFn1, runEffFn2, runEffFn3, runEffFn5)
+import D3.Base (D3, D3Element, Hierarchy, Index)
 import DOM.Event.Types (EventType)
 import Data.List (List(..), foldM)
 import Data.Maybe (Maybe)
@@ -92,38 +88,12 @@ foreign import classedFnP :: ∀ d eff. EffFn3 (d3::D3|eff)         -- eff
                                             (Selection d)             -- 3rd arg
                                             (Selection d)             -- result
 
-
-foreign import attrFn  :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
--- foreign import attrFnP :: ∀ d v eff. EffFn3 (d3::D3|eff)        -- eff of attrFnP
---                                              String              -- 1st arg of attrFnP
---                                              (D3CallbackDINE eff d v)   -- 2nd arg is callback
---                                              (Selection d)          -- 3rd arg of attrFnP
---                                              (Selection d)          -- result of attrFnP
-
 foreign import styleFn   :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
-foreign import styleFnFn :: ∀ d v eff. EffFn3 (d3::D3|eff)
-                                             String
-                                             (D3CallbackText v eff) -- a callback which will give us a style
-                                             (Selection d)
-                                             (Selection d)
-
-foreign import textFn   :: ∀ d v eff. EffFn2 (d3::D3|eff) v (Selection d) (Selection d)
-foreign import textFnFn :: ∀ d v eff. EffFn2 (d3::D3|eff)
-                                             (D3CallbackText v eff) -- produces a String for text of element
-                                             (Selection d)
-                                             (Selection d)
-
-classed :: ∀ d eff. String -> ClassSetter d    -> Selection d -> Eff (d3::D3|eff) (Selection d)
-classed s (SetAll b)         = runEffFn3 classedFn  s b
-classed s (SetSome p)        = runEffFn3 classedFnP s (mkEffFn4 p)
+foreign import attrFn  :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
 
 -- | turrrrrns out this is a Nullable value TODO
 getAttr :: ∀ v d eff. String                       -> Selection d -> Eff (d3::D3|eff) v
 getAttr s                    = runEffFn2 getAttrFn  s
-
--- attr :: ∀ d x eff. AttrSetter d x      -> Selection d -> Eff (d3::D3|eff) (Selection d)
--- attr (SetAttr s x)           = runEffFn3 attrFn  s x
--- attr (AttrFn s p)            = runEffFn3 attrFnP s (mkEffFn4 p)
 
 listOfAttr :: ∀ eff d. List Attr -> Selection d -> Eff (d3::D3|eff) (Selection d)
 listOfAttr Nil s = pure s
@@ -137,14 +107,6 @@ listOfAttr as s = do
             case at of
             (Style stylename _) -> runEffFn3 styleFn stylename at sel -- now remember that you have to handle this in the FFI now as for attrFn
             _ ->  runEffFn3 attrFn (getTag at) at sel
-
-style  :: ∀ d eff.  String -> PolyValue d String -> Selection d -> Eff (d3::D3|eff) (Selection d)
-style name (Value value)     = runEffFn3 styleFn name value
-style name (SetByIndex f)    = runEffFn3 styleFnFn name (mkEffFn2 f)
-
-text  :: ∀ d eff.  PolyValue d String            -> Selection d -> Eff (d3::D3|eff) (Selection d)
-text       (Value value)     = runEffFn2 textFn value
-text       (SetByIndex f)    = runEffFn2 textFnFn (mkEffFn2 f)
 
 d3Select :: ∀ d eff. String                                    -> Eff (d3::D3|eff) (Selection d)
 d3Select selector            = runEffFn1 d3SelectFn selector
@@ -175,9 +137,9 @@ dataBindHierarchy h         = runEffFn2 bindHierarchyFn h
 dataBindIndexHierarchy :: ∀ d1 d2 k eff. Hierarchy d2 -> (d2 -> k)            -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
 dataBindIndexHierarchy h keyFn  = runEffFn3 bindHierarchyFnK h keyFn
 
-filter  :: ∀ d eff.  Filter d                   -> Selection d -> Eff (d3::D3|eff) (Selection d)
-filter (Selector s)       = runEffFn2 filterFn s
-filter (Predicate p)      = runEffFn2 filterFnP p
+-- filter  :: ∀ d eff.  Filter d                   -> Selection d -> Eff (d3::D3|eff) (Selection d)
+-- filter (Selector s)       = runEffFn2 filterFn s
+-- filter (Predicate p)      = runEffFn2 filterFnP p
 
 order :: ∀ d eff.                                  Selection d -> Eff (d3::D3|eff) (Selection d)
 order                     = runEffFn1 orderFn

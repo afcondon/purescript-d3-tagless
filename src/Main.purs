@@ -1,16 +1,18 @@
 module Main where
 
+import TaglessD3.StringImpl (runStructure) as S
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3, D3Element)
-import D3Impl (runD3Monad)
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
-import Prelude (Unit, discard, bind, ($), (/))
-import TaglessD3.AttrNew (Attr(..), attrFunction, attrValue, attributes)
+import Data.Monoid (mempty)
+import Prelude (Unit, bind, discard, show, ($), (*), (/))
+import TaglessD3.AttrNew (Attr(..), AttrSetter, CssUnit(..), attrFunction, attrValue, attributes)
 import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup), D3Transition(NamedTransition), Duration(MS))
-import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, selectAll, dataBind, enter, transition)
+import TaglessD3.D3Impl (runD3Monad)
+import TaglessD3.Selection (class AbstractSelection, D3Data(ArrayD), append, attrs, d3Select, dataBind, enter, selectAll)
 
 d3Script :: ∀ m. (AbstractSelection m) => m Unit
 d3Script = do
@@ -35,24 +37,27 @@ myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array
 attrList :: List Attr
 attrList     = attributes $ [ CX $ attrValue 20
                             , CY $ attrValue 20
-                            , R  $ attrValue 20
+                            , R  $ attrFunction Px calcRadius
                             , Style "width" $ attrValue "48%"
-                            , Style "height" $ attrFunction lp ] -- shows callback but also demos like of typecheck on selection...
+                            , Style "height" $ attrFunction Px lp ] -- shows callback but also demos lack of typecheck on selection...
+
+calcRadius :: AttrSetter Int Int
+calcRadius d i n e = d * 2
 
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }
 
-lp :: ExData -> Number -> Array D3Element -> D3Element -> String
+lp :: ExData -> Number -> Array D3Element -> D3Element -> Int
 lp { name, age } _ _ _ =
     case name, age of -- silly little function just shows one way you might use an index function (NB in many cases D3 has better solutions for grouping)
-    "awn", _ -> "20px"
-    _, 0     -> "50px"
-    _, _     -> "100px"
+    "awn", _ -> 20
+    _, 0     -> 50
+    _, _     -> 100
 
 
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
     _ <- runD3Monad d3Script Nothing
     log "\n\n\n====== cool beans =======\n\n\n"
-    -- let ss = show $ S.runStructure d3Script mempty
-    -- log ss
+    let ss = show $ S.runStructure d3Script mempty
+    log ss
