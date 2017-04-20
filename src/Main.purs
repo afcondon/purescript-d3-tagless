@@ -42,12 +42,12 @@ attrList     = attributes $ [ CX $ attrValue 20
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }
 
-lp :: ExData -> Number -> Array D3Element -> D3Element -> Char
+lp :: ExData -> Number -> Array D3Element -> D3Element -> String
 lp { name, age } _ _ _ =
     case name, age of -- silly little function just shows one way you might use an index function (NB in many cases D3 has better solutions for grouping)
-    "awn", _ -> 'a'
-    _, 0     -> 'b'
-    _, _     -> 'c'
+    "awn", _ -> "20px"
+    _, 0     -> "50px"
+    _, _     -> "100px"
 
 
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
