@@ -100,10 +100,10 @@ transition' :: D3Transition -> SelectionFn Unit
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]
 
 dataBind    :: ∀ d i. D3Data d i -> SelectionFn Unit
-dataBind (ArrayD     ds (Just k)) d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
-dataBind (ArrayD     ds Nothing)  d3s = Tuple unit $ d3s ++ ["Data from Array (no index fn)"]
-dataBind (HierarchyD hs (Just k)) d3s = Tuple unit $ d3s ++ ["Data from Hierarchy with index function"]
-dataBind (HierarchyD ds Nothing)  d3s = Tuple unit $ d3s ++ ["Data from Hierarchy (no index fn)"]
+dataBind (ArrayDI     ds k) d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
+dataBind (ArrayD     ds)  d3s   = Tuple unit $ d3s ++ ["Data from Array (no index fn)"]
+dataBind (HierarchyDI hs k) d3s = Tuple unit $ d3s ++ ["Data from Hierarchy with index function"]
+dataBind (HierarchyD ds)  d3s   = Tuple unit $ d3s ++ ["Data from Hierarchy (no index fn)"]
 
 -- the selection being merged is added to our selection, but don't yet
 -- understand how to capture name from merged selection? maybe change f to

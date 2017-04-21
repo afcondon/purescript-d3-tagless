@@ -85,19 +85,19 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
         pure unit -- TODO
 
     -- dataBind :: ∀ d i. D3Data d i -> (m Unit)
-    dataBind (ArrayD ds (Just k)) = do
+    dataBind (ArrayDI ds k) = do
         ms <- get
         put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindIndexArray ds k)) <$> ms
 
-    dataBind (ArrayD ds Nothing) = do
+    dataBind (ArrayD ds) = do
         ms <- get
         put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindArray ds)) <$> ms
 
-    dataBind (HierarchyD ds (Just k)) = do
+    dataBind (HierarchyDI ds k) = do
         ms <- get
         put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindIndexHierarchy ds k)) <$> ms
 
-    dataBind (HierarchyD ds Nothing) = do
+    dataBind (HierarchyD ds) = do
         ms <- get
         put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindHierarchy ds)) <$> ms
 

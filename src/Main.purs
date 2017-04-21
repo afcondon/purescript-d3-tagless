@@ -1,6 +1,5 @@
 module Main where
 
-import TaglessD3.StringImpl (runStructure) as S
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3, D3Element)
@@ -12,7 +11,8 @@ import Prelude (Unit, bind, discard, show, ($), (*), (/))
 import TaglessD3.AttrNew (Attr(..), AttrSetter, CssUnit(..), attrFunction, attrValue, attributes)
 import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup), D3Transition(NamedTransition), Duration(MS))
 import TaglessD3.D3Impl (runD3Monad)
-import TaglessD3.Selection (class AbstractSelection, D3Data(ArrayD), append, attrs, d3Select, dataBind, enter, selectAll)
+import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, selectAll)
+import TaglessD3.StringImpl (runStructure) as S
 
 type D3Script = ∀ m. (AbstractSelection m) => m Unit
 
@@ -31,10 +31,10 @@ myTransition :: D3Transition
 myTransition = NamedTransition "t1" $ MS 500
 
 myData :: forall t8. D3Data Int t8
-myData       = ArrayD [1,2,3,4,5] Nothing
+myData       = ArrayD [1,2,3,4,5]
 
 myData' :: D3Data Int Number
-myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
+myData'      = ArrayDI [1,2,3,4,5,6,7,8] (\i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
 attrList = attributes $ [ CX $ attrValue 20 Pt

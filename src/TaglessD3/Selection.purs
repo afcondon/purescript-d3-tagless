@@ -2,13 +2,14 @@ module TaglessD3.Selection where
 
 import D3.Base (Hierarchy)
 import Data.List (List)
-import Data.Maybe (Maybe)
 import Prelude (class Monad, Unit)
 import TaglessD3.AttrNew (Attr)
 import TaglessD3.Base (D3ElementType, D3Transition, Selector)
 
-data D3Data d i = ArrayD     (Array d)     (Maybe (d -> i))
-                | HierarchyD (Hierarchy d) (Maybe (d -> i))
+data D3Data d i = ArrayD     (Array d)
+                | HierarchyD (Hierarchy d)
+                | ArrayDI     (Array d)     (d -> i)
+                | HierarchyDI (Hierarchy d) (d -> i)
 
 class (Monad m) <= AbstractSelection m where
     d3Select    :: Selector      -> (m Unit)
