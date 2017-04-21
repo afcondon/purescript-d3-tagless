@@ -1,6 +1,6 @@
 module TaglessD3.StringImpl where
 
-import TaglessD3.AttrNew
+import TaglessD3.AttrNew (Attr, showListOfAttributes)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (class Monoid)
@@ -94,7 +94,7 @@ exit' :: SelectionFn Unit
 exit' d3s = Tuple unit $ d3s ++ ["Exit"]
 
 attrs' :: List Attr -> SelectionFn Unit
-attrs' as d3s = Tuple unit $ d3s ++ [ (renderArrayOfAttributes as) ]
+attrs' as d3s = Tuple unit $ d3s ++ [ (showListOfAttributes as) ]
 
 transition' :: D3Transition -> SelectionFn Unit
 transition' t d3s = Tuple unit $ d3s ++ [ show t ]

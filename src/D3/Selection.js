@@ -88,7 +88,8 @@ exports.sizeFn      = function (selection)               {
     return selection.size(); }
 
 exports.styleFn     = function (key, val, selection)     {
-    var value = val.value1.value0.value; // unpacking the Exists structure
+    // unpacking the Exists structure - should try to find a way to do this on PS side instead TODO
+    var value = val.value1.value0.value;
     return selection.style(key, value); }
 
 exports.styleFnFn   = function (key, fn, selection)      {

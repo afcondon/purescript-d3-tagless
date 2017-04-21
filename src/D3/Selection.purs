@@ -47,9 +47,9 @@ foreign import appendFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String      
 foreign import bindDataFn    :: ∀ d1 d2 eff.  EffFn2 (d3::D3|eff) (Array d2)                  (Selection d1) (Selection d2)
 foreign import bindDataFnK   :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Array d2) (d2 -> k)       (Selection d1) (Selection d2)
 foreign import bindHierarchyFn  :: ∀ d1 d2 eff.   EffFn2 (d3::D3|eff) (Hierarchy d2)          (Selection d1) (Selection d2)
-foreign import bindHierarchyFnK :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Hierarchy d2) (d2 -> k) (Selection d1) (Selection d2)
-foreign import d3SelectAllFn :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                    (Selection d)
-foreign import d3SelectFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                    (Selection d)
+foreign import bindHierarchyFnK :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Hierarchy d2) (d2 -> k) (Selection d1)(Selection d2)
+foreign import d3SelectAllFn :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                     (Selection d)
+foreign import d3SelectFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                     (Selection d)
 foreign import emptyFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) Boolean
 foreign import enterFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
 foreign import exitFn        :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
@@ -105,23 +105,23 @@ listOfAttr as s = do
         applyAttr :: Selection d -> Attr -> Eff (d3::D3|eff) (Selection d)
         applyAttr sel at =
             case at of
-            (Style stylename _) -> runEffFn3 styleFn stylename at sel -- now remember that you have to handle this in the FFI now as for attrFn
+            (Style stylename _) -> runEffFn3 styleFn stylename at sel
             _ ->  runEffFn3 attrFn (getTag at) at sel
 
-d3Select :: ∀ d eff. String                                    -> Eff (d3::D3|eff) (Selection d)
-d3Select selector            = runEffFn1 d3SelectFn selector
+d3Select :: ∀ d eff. String -> Eff (d3::D3|eff) (Selection d)
+d3Select selector = runEffFn1 d3SelectFn selector
 
-d3SelectAll :: ∀ d eff. String                                 -> Eff (d3::D3|eff) (Selection d)
-d3SelectAll selector         = runEffFn1 d3SelectAllFn selector
+d3SelectAll :: ∀ d eff. String -> Eff (d3::D3|eff) (Selection d)
+d3SelectAll selector = runEffFn1 d3SelectAllFn selector
 
-selectAll :: ∀ d eff. String                    -> Selection d -> Eff (d3::D3|eff) (Selection d)
-selectAll selector           = runEffFn2 selectAllFn selector
+selectAll :: ∀ d eff. String -> Selection d -> Eff (d3::D3|eff) (Selection d)
+selectAll selector = runEffFn2 selectAllFn selector
 
-selectElem :: ∀ d eff. D3Element                               -> Eff (d3::D3|eff) (Selection d)  -- think this doesn't actually exist...TODO
-selectElem element           = runEffFn1 selectElFn element
+selectElem :: ∀ d eff. D3Element -> Eff (d3::D3|eff) (Selection d)  -- think this doesn't actually exist...TODO
+selectElem element = runEffFn1 selectElFn element
 
-select  :: ∀ d eff.  String                     -> Selection d -> Eff (d3::D3|eff) (Selection d)
-select selector              = runEffFn2 selectFn selector
+select  :: ∀ d eff.  String -> Selection d -> Eff (d3::D3|eff) (Selection d)
+select selector = runEffFn2 selectFn selector
 
 -- would be nice to express that Keyed needs k to be Ord, will have to wait for GADTs
 -- dataBind :: ∀ d k eff. Ord k => DataBind d k    -> Selection d -> Eff (d3::D3|eff) (Selection d)

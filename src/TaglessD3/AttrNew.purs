@@ -3,27 +3,37 @@ module TaglessD3.AttrNew (
     , Attr'
     , AttrSetter
     , D3Attr(..)
-    , D3Selection'
-    , D3Effect
     , attrValue
     , attrFunction
     , attributes
-    , renderArrayOfAttributes
+    , showListOfAttributes
     , getTag
     , CssUnit(..)
     )where
 
-import Control.Monad.Eff (Eff)
-import D3.Base (D3, D3Element)
+
+import D3.Base (D3Element)
 import Data.Exists (Exists, mkExists, runExists)
 import Data.Foldable (class Foldable)
-import Data.Function.Uncurried (mkFn4)
+import Data.Function.Uncurried (Fn4)
 import Data.List (List(..), foldl, fromFoldable, intercalate)
-import Prelude (class Show, Unit, const, map, pure, show, unit, ($), (<>))
+import Prelude (class Show, const, map, show, ($), (<>))
 
-type D3Effect = ∀ e. Eff (d3 :: D3 | e) Unit
+-- The supported length unit identifiers are: em, ex, px, pt, pc, cm, mm, in, and percentages.
+data CssUnit = Em | Ex | Px | Pt | Pc | Cm | Mm | In | Percent
+instance showCssUnit :: Show CssUnit where
+    show Em = "em"
+    show Ex = "ex"
+    show Px = "px"
+    show Pt = "pt"
+    show Pc = "pc"
+    show Cm = "cm"
+    show Mm = "mm"
+    show In = "in"
+    show Percent  = "%"
 
-type D3Selection' = Unit -- dummy definition for now
+type AttrSetter d v = d -> Number -> (Array D3Element) -> D3Element -> v
+
 data D3Attr a = D3Attr { value :: a
                        , showValue :: a -> String -- this only produces a String, not enough for actually passing to D3
                        , units :: String
@@ -55,20 +65,20 @@ data Attr = CX                  Attr' -- circles only
         --   | Fill                (ValueOrCallback d Color)
         --   | Stroke              (ValueOrCallback d Color)
 
-dummyD3Op :: ∀ a. D3Selection' -> a -> D3Effect
-dummyD3Op s a = pure unit
-
-dummyD3OpF :: ∀ d a. D3Selection' -> (d -> a) -> D3Effect
-dummyD3OpF s fa = pure unit
-
-renderArrayOfAttributes :: List Attr -> String
-renderArrayOfAttributes attrs = intercalate ", " $ foldl go Nil attrs
+showListOfAttributes :: List Attr -> String
+showListOfAttributes attrs = intercalate ", " $ foldl go Nil attrs
     where
     go :: List String -> Attr -> List String
     go acc attr = Cons (show attr) acc
 
+showAll :: List Attr' -> List String
+showAll = map (runExists showOne)
+
+showOne :: ∀ a. D3Attr a -> String
+showOne (D3Attr ops) = ops.showValue ops.value
+
 instance showD3Attr :: Show (D3Attr a) where
-  show (D3Attr { value, showValue }) = "Attr a: " <> showValue value
+  show (D3Attr { value, showValue, units }) = "Attr a: " <> showValue value <> show units
 
 instance showAttr :: Show Attr where
   show (CX a')
@@ -120,28 +130,13 @@ attributes :: ∀ f a. (Foldable f) => f a -> List a
 attributes = fromFoldable
 
 -- constructors for attribute values, both values and callback functions
-type AttrSetter d v = d -> Number -> (Array D3Element) -> D3Element -> v
+attrValue :: ∀ v. Show v => v -> CssUnit -> Attr'
+attrValue v u = mkExists (D3Attr { value: show v <> show u, showValue: show, units: show u })
 
-attrValue :: ∀ a. Show a => a -> Attr'
-attrValue v = mkExists (D3Attr { value: v, showValue: show, units: "" })
+attrFunction :: ∀ d v. AttrSetter d v -> CssUnit -> Attr'
+attrFunction f u = mkExists (D3Attr { value: uncurryAttrSetter (show u) f, showValue: const "(function)", units: show u })
 
-data CssUnit = Px | Em | Pc | Rem | None
-instance showCssUnit :: Show CssUnit where
-  show Px = "px"
-  show Em = "em"
-  show Rem = "rem"
-  show Pc = "%"
-  show None = ""
-
-attrFunction :: ∀ d r. CssUnit -> AttrSetter d r -> Attr'
-attrFunction u f = mkExists (D3Attr { value: mkFn4 f, showValue: const "(function)", units: show u })
-
-showAll :: List Attr' -> List String
-showAll = map (runExists showOne)
-
-showOne :: ∀ a. D3Attr a -> String
-showOne (D3Attr ops) = ops.showValue ops.value
-
+foreign import uncurryAttrSetter :: forall d v. String -> AttrSetter d v -> Fn4 d Number (Array D3Element) D3Element String
 
 getTag :: Attr -> String
 getTag a =
@@ -165,6 +160,6 @@ getTag a =
     (PatternUnits _)  -> "patternunits"
     (Text _)          -> "text"
     (Type _)          -> "type"
-    (Style _ _)       -> "style" -- refactor so that different FFI is called TODO
-    (Class _)         -> "class" -- refactor so that different FFI is called TODO
-    (Property _ _)    -> "property" -- refactor so that different FFI is called TODO
+    (Style _ _)       -> "style"
+    (Class _)         -> "class"
+    (Property _ _)    -> "property"

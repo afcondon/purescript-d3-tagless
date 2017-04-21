@@ -14,11 +14,13 @@ import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup), D3Transition(NamedTra
 import TaglessD3.D3Impl (runD3Monad)
 import TaglessD3.Selection (class AbstractSelection, D3Data(ArrayD), append, attrs, d3Select, dataBind, enter, selectAll)
 
-d3Script :: ∀ m. (AbstractSelection m) => m Unit
+type D3Script = ∀ m. (AbstractSelection m) => m Unit
+
+d3Script :: D3Script
 d3Script = do
     d3Select "#chart"
     append SvgGroup
-    selectAll "text"
+    selectAll "circle"
     dataBind myData'
     enter
     append SvgCircle
@@ -35,11 +37,11 @@ myData' :: D3Data Int Number
 myData'      = ArrayD [1,2,3,4,5,6,7,8] (Just \i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
-attrList     = attributes $ [ CX $ attrValue 20
-                            , CY $ attrValue 20
-                            , R  $ attrFunction Px calcRadius
-                            , Style "width" $ attrValue "48%"
-                            , Style "height" $ attrFunction Px lp ] -- shows callback but also demos lack of typecheck on selection...
+attrList = attributes $ [ CX $ attrValue 20 Pt
+                        , CY $ attrFunction (\d _ _ _ -> d * 3) Px
+                        , R  $ attrFunction calcRadius Px
+                        , Style "width" $ attrValue 48 Percent
+                        , Style "height" $ attrFunction lp Px ] -- shows callback but also demos lack of typecheck on selection...
 
 calcRadius :: AttrSetter Int Int
 calcRadius d i n e = d * 2
@@ -47,7 +49,8 @@ calcRadius d i n e = d * 2
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }
 
-lp :: ExData -> Number -> Array D3Element -> D3Element -> Int
+-- lp :: ExData -> Number -> Array D3Element -> D3Element -> Int
+lp :: AttrSetter ExData Int
 lp { name, age } _ _ _ =
     case name, age of -- silly little function just shows one way you might use an index function (NB in many cases D3 has better solutions for grouping)
     "awn", _ -> 20
