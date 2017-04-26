@@ -2,33 +2,32 @@ module Main where
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import D3.Base (D3, D3Element)
+import D3.Base (D3)
+import D3.Transition (D3Transition(..))
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
 import Prelude (Unit, bind, discard, show, ($), (*), (/))
+import TaglessD3.API (D3Data(ArrayDI, ArrayD), append, applyTransition, attrs, d3Select, dataBind, enter, makeTransition, selectAll)
 import TaglessD3.AttrNew (Attr(..), AttrSetter, CssUnit(..), attrFunction, attrValue, attributes)
-import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup), D3Transition(NamedTransition), Duration(MS))
-import TaglessD3.D3Impl (runD3Monad)
-import TaglessD3.Selection (class AbstractSelection, D3Data(..), append, attrs, d3Select, dataBind, enter, selectAll)
+import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup))
+import TaglessD3.D3Impl (runD3Monad, D3Script)
 import TaglessD3.StringImpl (runStructure) as S
-
-type D3Script = ∀ m. (AbstractSelection m) => m Unit
 
 d3Script :: D3Script
 d3Script = do
     d3Select "#chart"
     append SvgGroup
-    selectAll "circle"
+    selectAll "circle" -- this select, the databind, the enter and the append could surely all be one function?
     dataBind myData'
     enter
     append SvgCircle
     attrs attrList
-    -- transition myTransition
+    applyTransition $ myTransition $ TransitionName "foo"
 
-myTransition :: D3Transition
-myTransition = NamedTransition "t1" $ MS 500
+myTransition :: D3Transition -> D3Script
+myTransition t = makeTransition t
 
 myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5]

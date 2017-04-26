@@ -2,17 +2,21 @@ module TaglessD3.D3Impl where
 
 import Prelude
 import D3.Selection as D3
+import D3.Transition as D3
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (class MonadEff)
 import Control.Monad.Eff.Unsafe (unsafePerformEff)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
 import D3.Base (D3)
+import D3.Transition (D3Transition(..))
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple, snd)
+import TaglessD3.API (class AbstractD3API, D3Data(..))
 import TaglessD3.AttrNew (D3Attr(D3Attr))
-import TaglessD3.Selection (class AbstractSelection, D3Data(..))
 import Unsafe.Coerce (unsafeCoerce)
+
+type D3Script = ∀ m. (AbstractD3API m) => m Unit
 
 type D3State d = Maybe (D3.Selection d)
 newtype D3Monad eff d a = D3Monad (StateT (D3State d) (Eff eff) a)
@@ -36,7 +40,7 @@ fsState (D3Monad m) = liftA1 snd $ runStateT m Nothing
 -- fsRun (D3Monad m) = liftA1 fst $ runStateT m "initial state"
 
 -- now to fulfill the contract with the abstract definition of D3 Selections
-instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
+instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
     d3Select selector = put $ Just $ unsafePerformEff $ D3.d3Select selector
 
     d3SelectAll selector = put $ Just $ unsafePerformEff $ D3.d3SelectAll selector
@@ -75,14 +79,16 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
         ms <- get
         put $ (unsafePerformEff <<< D3.exit) <$> ms
 
-    attrs attributes           = do -- TODO
+    attrs attributes           = do
         ms <- get
         put $ (unsafePerformEff <<< D3.listOfAttr attributes) <$> ms
 
-    transition t               = do -- TODO
+    applyTransition t               = do
         ms <- get
-        -- put $ (unsafePerformEff <<< D3.selectionTransition t) <$> ms
-        pure unit -- TODO
+        -- let name = case t of
+        --             (TransitionName tn) -> tn
+        --             _ -> ""
+        put $ (unsafePerformEff <<< D3.exit) <$> ms
 
     -- dataBind :: ∀ d i. D3Data d i -> (m Unit)
     dataBind (ArrayDI ds k) = do
@@ -100,6 +106,39 @@ instance selectionDummySelection :: AbstractSelection (D3Monad eff d) where
     dataBind (HierarchyD ds) = do
         ms <- get
         put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindHierarchy ds)) <$> ms
+
+    -- tAttrs       :: List Attr     -> (m Unit)
+    tAttrs attributes           = do -- TODO
+        ms <- get
+        put $ (unsafePerformEff <<< D3.listOfAttr attributes) <$> ms
+
+    -- tMerge       :: m Unit        -> (m Unit)
+    tMerge selection            = do
+        ms <- get
+        let merging = unsafePerformEff $ fsState selection
+        let merged = D3.merge <$> merging <*> ms
+        put $ unsafePerformEff <$> merged
+
+    -- tRemove      ::                  (m Unit)
+    tRemove                     = do
+        ms <- get
+        put $ (unsafePerformEff <<< D3.remove) <$> ms
+
+    -- tSelect      :: Selector      -> (m Unit)
+    tSelect selector = do
+        ms <- get
+        put $ (unsafePerformEff <<< D3.select selector) <$> ms
+
+    -- tSelectAll   :: Selector      -> (m Unit)
+    tSelectAll selector         = do
+        ms <- get
+        put $ (unsafePerformEff <<< D3.selectAll selector) <$> ms
+
+    -- tTransition  :: D3Transition  -> (m Unit)
+    makeTransition t               = do -- TODO
+        ms <- get
+        put $ (unsafePerformEff <<< D3.exit) <$> ms
+
 
 class RunD3 a where
   runD3 :: ∀ e. a -> Eff (d3 :: D3 | e) Unit

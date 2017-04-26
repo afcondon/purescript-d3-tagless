@@ -1,14 +1,15 @@
 module TaglessD3.StringImpl where
 
-import TaglessD3.AttrNew (Attr, showListOfAttributes)
+import D3.Transition (D3Transition(..))
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (class Monoid)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
-import TaglessD3.Base (D3ElementType, D3Transition, Selector)
-import TaglessD3.Selection (class AbstractSelection, D3Data(..))
+import TaglessD3.API (class AbstractD3API, D3Data(..))
+import TaglessD3.AttrNew (Attr, showListOfAttributes)
+import TaglessD3.Base (D3ElementType, Selector)
 
 data D3Structure = D3S String (Array (Array String))
 
@@ -51,7 +52,7 @@ instance bindFakeSelection :: Bind FakeSelection where
 
 instance monadFakeSelection :: Monad FakeSelection
 
-instance selectionDummySelection :: AbstractSelection FakeSelection where
+instance selectionDummySelection :: AbstractD3API FakeSelection where
     d3Select selector    = FakeSelection $ d3Select' selector
     d3SelectAll selector = FakeSelection $ d3SelectAll' selector
     select selector      = FakeSelection $ select' selector
@@ -63,8 +64,14 @@ instance selectionDummySelection :: AbstractSelection FakeSelection where
     enter                = FakeSelection $ enter'
     exit                 = FakeSelection $ exit'
     attrs attributes     = FakeSelection $ attrs' attributes
-    transition t         = FakeSelection $ transition' t
+    applyTransition t    = FakeSelection $ applyTransition' t
     dataBind d           = FakeSelection $ dataBind d
+    tAttrs attributes    = FakeSelection $ tAttrs' attributes
+    tMerge selection     = FakeSelection $ tMerge' selection
+    tRemove              = FakeSelection $ tRemove'
+    tSelect selector     = FakeSelection $ tSelect' selector
+    tSelectAll selector  = FakeSelection $ tSelectAll' selector
+    makeTransition t     = FakeSelection $ makeTransition' t
 
 d3Select' :: Selector -> SelectionFn Unit
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
@@ -96,8 +103,8 @@ exit' d3s = Tuple unit $ d3s ++ ["Exit"]
 attrs' :: List Attr -> SelectionFn Unit
 attrs' as d3s = Tuple unit $ d3s ++ [ (showListOfAttributes as) ]
 
-transition' :: D3Transition -> SelectionFn Unit
-transition' t d3s = Tuple unit $ d3s ++ [ show t ]
+applyTransition' :: FakeSelection Unit -> SelectionFn Unit -- essentially the same as a merge
+applyTransition' _ d3s = Tuple unit $ d3s ++ [ "transition", "name" ] -- got to get the name and details out of the transition here
 
 dataBind    :: ∀ d i. D3Data d i -> SelectionFn Unit
 dataBind (ArrayDI     ds k) d3s = Tuple unit $ d3s ++ ["Data from Array with index function"]
@@ -110,6 +117,25 @@ dataBind (HierarchyD ds)  d3s   = Tuple unit $ d3s ++ ["Data from Hierarchy (no 
 -- different function?
 merge' :: FakeSelection Unit -> SelectionFn Unit
 merge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> [["D3Merge", "how do we capture the merging selection's name here???"]])
+
+tAttrs' :: List Attr -> SelectionFn Unit
+tAttrs' as d3s    = Tuple unit $ d3s ++ [(showListOfAttributes as)]
+
+tMerge' :: FakeSelection Unit -> SelectionFn Unit
+tMerge' (FakeSelection f) (D3S name statements) = Tuple unit (D3S name $ statements <> [["D3 Transition Merge", "how do we capture the merging selection's name here???"]])
+
+tRemove' :: SelectionFn Unit
+tRemove' d3s = Tuple unit $ d3s ++ ["tRemove"]
+
+tSelect' :: Selector -> SelectionFn Unit
+tSelect' selector d3s = Tuple unit $ d3s ++ ["tSelect", selector]
+
+tSelectAll' :: Selector -> SelectionFn Unit
+tSelectAll' selector d3s  = Tuple unit $ d3s ++ ["tSelectAll", selector]
+
+makeTransition' :: D3Transition  -> SelectionFn Unit
+makeTransition' (TransitionName tn) d3s = Tuple unit $ d3s ++ ["Transition: ", tn]
+makeTransition' UnnamedTransition d3s = Tuple unit $ d3s ++ ["Unnamed ransition"]
 
 
 -- | Utility functions
