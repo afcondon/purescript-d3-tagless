@@ -85,10 +85,14 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
 
     applyTransition t               = do
         ms <- get
-        -- let name = case t of
-        --             (TransitionName tn) -> tn
-        --             _ -> ""
-        put $ (unsafePerformEff <<< D3.exit) <$> ms
+        let tAsMonad = unsafePerformEff $ fsState t
+        let transitionApplied = D3.merge <$> tAsMonad <*> ms
+        put $ unsafePerformEff <$> transitionApplied
+-- in API.purs
+    -- applyTransition  :: (m Unit)  -> (m Unit)
+-- in D3.Transition.purs
+    -- d3Transition :: ∀ eff d. D3Transition -> Eff (d3::D3|eff) (Selection d)
+    -- addTransition :: ∀ d eff.  String -> Selection d  -> Eff (d3::D3|eff) (Selection d)
 
     -- dataBind :: ∀ d i. D3Data d i -> (m Unit)
     dataBind (ArrayDI ds k) = do
@@ -135,9 +139,7 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
         put $ (unsafePerformEff <<< D3.selectAll selector) <$> ms
 
     -- tTransition  :: D3Transition  -> (m Unit)
-    makeTransition t               = do -- TODO
-        ms <- get
-        put $ (unsafePerformEff <<< D3.exit) <$> ms
+    makeTransition t = put $ Just $ unsafePerformEff $ D3.d3Transition t
 
 
 class RunD3 a where

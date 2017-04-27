@@ -25,7 +25,7 @@ class (Monad m) <= AbstractD3API m where
     remove      ::                  (m Unit)
     select      :: Selector      -> (m Unit)
     selectAll   :: Selector      -> (m Unit)
-    applyTransition  :: (m Unit)  -> (m Unit)
+    applyTransition :: m Unit    -> (m Unit) -- effectively this is like a merge, for now. not optimal.
 -- the following methods on D3's selection are not yet implemented in tagless form
     -- call
     -- classed -- implemented as part of attr(s)

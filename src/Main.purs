@@ -24,10 +24,18 @@ d3Script = do
     enter
     append SvgCircle
     attrs attrList
-    applyTransition $ myTransition $ TransitionName "foo"
+    applyTransition $ myTransition
 
-myTransition :: D3Transition -> D3Script
-myTransition t = makeTransition t
+-- idempotency of d3.transtion() this next relies on D3 to return us the same
+-- transition as "name" (ie if named transition exists) allowing us to call this
+-- function multiple times from different scripts that are under interpretation
+
+-- now, if we want to add (common) attributes to this transition definition
+-- we'll have to check if it already exists and not apply those attributes for
+-- existing transitions
+myTransition :: D3Script
+myTransition = do
+    makeTransition $ TransitionName "foo"
 
 myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5]
