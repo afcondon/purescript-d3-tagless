@@ -1,7 +1,7 @@
 /* global exports */
 "use strict";
 
-exports.d3TransitionFn    = function (name)                     { return d3.transition(name).duration(2000).attr("cx", "200px").style("fill", "red"); }
+exports.d3TransitionFn    = function (name)                     { return d3.transition(name); }
 exports.d3TransitionFn2   = function ()                         { return d3.transition(); }
 
 exports.attrFn            = function (name, value, transition)  { return transition.attr(name, value); }

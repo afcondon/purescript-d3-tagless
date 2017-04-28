@@ -1,6 +1,6 @@
 module D3.Transition
   ( D3DelayFn
-  , DelayValue(..)
+  , DelaySetter(..)
   , AttrInterpolator(..)
   -- , (Selection d)
   , D3Transition(..)
@@ -83,7 +83,7 @@ foreign import savedTransitionFn :: ∀ d x eff. EffFn2 (d3::D3|eff) (Selection 
 
 type D3DelayFn        d = ∀ eff. d -> Index -> Eff (d3::D3|eff) Time
 
-data DelayValue d = MilliSec Time
+data DelaySetter d = MilliSec Time
                   | DelayFn (D3DelayFn d)
 
 data AttrInterpolator d v =
@@ -121,7 +121,7 @@ savedTransition name        = runEffFn2 savedTransitionFn name
 duration :: ∀ d eff. Time                           -> Selection d -> Eff (d3::D3|eff) (Selection d)
 duration t                  = runEffFn2 durationFn t
 
-delay :: ∀ d eff. DelayValue d                      -> Selection d -> Eff (d3::D3|eff) (Selection d)
+delay :: ∀ d eff. DelaySetter d                      -> Selection d -> Eff (d3::D3|eff) (Selection d)
 delay (MilliSec t)          = runEffFn2 delayFn t
 delay (DelayFn f)           = runEffFn2 delayIFn (mkEffFn2 f)
 

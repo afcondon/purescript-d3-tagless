@@ -9,7 +9,7 @@ import Control.Monad.Eff.Unsafe (unsafePerformEff)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
 import D3.Base (D3)
-import D3.Transition (D3Transition(..))
+import D3.Transition (D3Transition(..), DelaySetter(..))
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple, snd)
 import TaglessD3.API (class AbstractD3API, D3Data(..))
@@ -140,6 +140,13 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
 
     -- tTransition  :: D3Transition  -> (m Unit)
     makeTransition t = put $ Just $ unsafePerformEff $ D3.d3Transition t
+
+    -- tDelay       :: ∀ d. DelaySetter d -> (m Unit)
+    tDelay t = do
+        ms <- get
+        let t' = unsafeCoerce t
+        put $ (unsafePerformEff <<< D3.delay t') <$> ms
+
 
 
 class RunD3 a where

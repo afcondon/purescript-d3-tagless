@@ -1,7 +1,7 @@
 module TaglessD3.API where
 
 import D3.Base (Hierarchy)
-import D3.Transition (D3Transition)
+import D3.Transition (D3Transition, DelaySetter)
 import Data.List (List)
 import Prelude (class Monad, Unit)
 import TaglessD3.AttrNew (Attr)
@@ -53,6 +53,7 @@ class (Monad m) <= AbstractD3API m where
     tSelect      :: Selector      -> (m Unit)
     tSelectAll   :: Selector      -> (m Unit)
     makeTransition  :: D3Transition  -> (m Unit)
+    tDelay       :: ∀ d. DelaySetter d -> (m Unit)
     -- the following methods on D3's transition are not currently implemented in the tagless version
         -- attrTween
         -- call

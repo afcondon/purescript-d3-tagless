@@ -20,7 +20,7 @@ import Data.List (List(..), foldl, fromFoldable, intercalate)
 import Prelude (class Show, const, map, show, ($), (<>))
 
 -- The supported length unit identifiers are: em, ex, px, pt, pc, cm, mm, in, and percentages.
-data CssUnit = Em | Ex | Px | Pt | Pc | Cm | Mm | In | Percent
+data CssUnit = Em | Ex | Px | Pt | Pc | Cm | Mm | In | Percent | NoUnit
 instance showCssUnit :: Show CssUnit where
     show Em = "em"
     show Ex = "ex"
@@ -31,6 +31,7 @@ instance showCssUnit :: Show CssUnit where
     show Mm = "mm"
     show In = "in"
     show Percent  = "%"
+    show NoUnit = "" -- well, i don't love this, probably an argument for making styles differently TODO
 
 type AttrSetter d v = d -> Number -> (Array D3Element) -> D3Element -> v
 
@@ -131,7 +132,8 @@ attributes = fromFoldable
 
 -- constructors for attribute values, both values and callback functions
 attrValue :: ∀ v. Show v => v -> CssUnit -> Attr'
-attrValue v u = mkExists (D3Attr { value: show v <> show u, showValue: show, units: show u })
+attrValue v NoUnit = mkExists (D3Attr { value: v, showValue: show, units: "Simple String Value" })
+attrValue v u      = mkExists (D3Attr { value: show v <> show u, showValue: show, units: show u })
 
 attrFunction :: ∀ d v. AttrSetter d v -> CssUnit -> Attr'
 attrFunction f u = mkExists (D3Attr { value: uncurryAttrSetter (show u) f, showValue: const "(function)", units: show u })

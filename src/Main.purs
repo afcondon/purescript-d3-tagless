@@ -3,13 +3,13 @@ module Main where
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3)
-import D3.Transition (D3Transition(..))
+import D3.Transition (D3Transition(TransitionName), DelaySetter(MilliSec), tStyle)
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
 import Prelude (Unit, bind, discard, show, ($), (*), (/))
-import TaglessD3.API (D3Data(ArrayDI, ArrayD), append, applyTransition, attrs, d3Select, dataBind, enter, makeTransition, selectAll)
+import TaglessD3.API (D3Data(ArrayDI, ArrayD), append, applyTransition, attrs, d3Select, dataBind, enter, makeTransition, selectAll, tAttrs, tDelay)
 import TaglessD3.AttrNew (Attr(..), AttrSetter, CssUnit(..), attrFunction, attrValue, attributes)
 import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup))
 import TaglessD3.D3Impl (runD3Monad, D3Script)
@@ -36,6 +36,11 @@ d3Script = do
 myTransition :: D3Script
 myTransition = do
     makeTransition $ TransitionName "foo"
+    tDelay $ MilliSec 2000.0
+    tAttrs transitionAttrList
+
+transitionAttrList :: List Attr
+transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit ]
 
 myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5]
