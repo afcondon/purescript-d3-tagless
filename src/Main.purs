@@ -24,7 +24,9 @@ d3Script = do
     enter
     append SvgCircle
     attrs attrList
-    applyTransition $ myTransition
+    applyTransition $ makeTransition $ TransitionName "foo"
+    tDelay $ MilliSec 2000.0
+    tAttrs transitionAttrList
 
 -- idempotency of d3.transtion() this next relies on D3 to return us the same
 -- transition as "name" (ie if named transition exists) allowing us to call this
@@ -40,7 +42,9 @@ myTransition = do
     tAttrs transitionAttrList
 
 transitionAttrList :: List Attr
-transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit ]
+transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit
+                                  , CY $ attrFunction (\d _ _ _ -> d * 20) Px
+                                  ]
 
 myData :: forall t8. D3Data Int t8
 myData       = ArrayD [1,2,3,4,5]

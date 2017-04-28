@@ -63,6 +63,9 @@ exports.insertFn    = function (selector, selection)     {
 exports.mergeFn     = function (other, selection)        {
     return selection.merge(other); }
 
+exports.transitionFn     = function (transition, selection)        {
+    return selection.transition(transition); }
+
 exports.nodeFn      = function (selection)               {
     return selection.node(); }
 

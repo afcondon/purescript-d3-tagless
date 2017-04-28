@@ -86,7 +86,7 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
     applyTransition t               = do
         ms <- get
         let tAsMonad = unsafePerformEff $ fsState t
-        let transitionApplied = D3.merge <$> tAsMonad <*> ms
+        let transitionApplied = D3.transition <$> tAsMonad <*> ms
         put $ unsafePerformEff <$> transitionApplied
 -- in API.purs
     -- applyTransition  :: (m Unit)  -> (m Unit)

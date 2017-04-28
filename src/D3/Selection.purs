@@ -28,6 +28,7 @@ module D3.Selection
   , selectAll
   , selectElem
   , size
+  , transition
   ) where
 
 import Control.Monad.Eff (Eff, kind Effect)
@@ -58,6 +59,7 @@ foreign import filterFnP     :: ∀ d eff.      EffFn2 (d3::D3|eff) (d -> Boolea
 foreign import getAttrFn     :: ∀ v d eff.    EffFn2 (d3::D3|eff) String                      (Selection d) v
 foreign import insertFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
 foreign import mergeFn       :: ∀ d eff.      EffFn2 (d3::D3|eff) (Selection d)               (Selection d) (Selection d)
+foreign import transitionFn  :: ∀ d eff.      EffFn2 (d3::D3|eff) (Selection d)               (Selection d) (Selection d)
 foreign import nodeFn        :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Nullable D3Element)
 foreign import nodesFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Array D3Element)
 foreign import orderFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
@@ -98,8 +100,8 @@ getAttr s                    = runEffFn2 getAttrFn  s
 listOfAttr :: ∀ eff d. List Attr -> Selection d -> Eff (d3::D3|eff) (Selection d)
 listOfAttr Nil s = pure s
 listOfAttr as s = do
-    _ <- arrayOfSelections
-    pure s
+    s' <- arrayOfSelections
+    pure s'
     where
         arrayOfSelections = foldM applyAttr s as
         applyAttr :: Selection d -> Attr -> Eff (d3::D3|eff) (Selection d)
@@ -149,6 +151,9 @@ enter                     = runEffFn1 enterFn
 
 merge :: ∀ d eff.    Selection d                -> Selection d -> Eff (d3::D3|eff) (Selection d)
 merge                     = runEffFn2 mergeFn
+
+transition :: ∀ d eff.    Selection d                -> Selection d -> Eff (d3::D3|eff) (Selection d)
+transition                     = runEffFn2 transitionFn
 
 empty :: ∀ d eff.                                   Selection d -> Eff (d3::D3|eff) Boolean
 empty                     = runEffFn1 emptyFn
