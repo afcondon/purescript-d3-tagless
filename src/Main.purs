@@ -43,7 +43,7 @@ myTransition = do
 
 transitionAttrList :: List Attr
 transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit
-                                  , CY $ attrFunction (\d _ _ _ -> d * 20) Px
+                                  , CY $ attrFunction (\d _ _ _ -> d * 80) Px
                                   ]
 
 myData :: forall t8. D3Data Int t8
@@ -53,14 +53,14 @@ myData' :: D3Data Int Number
 myData'      = ArrayDI [1,2,3,4,5,6,7,8] (\i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
 attrList :: List Attr
-attrList = attributes $ [ CX $ attrValue 20 Pt
+attrList = attributes $ [ CX $ attrValue 200 Px
                         , CY $ attrFunction (\d _ _ _ -> d * 3) Px
                         , R  $ attrFunction calcRadius Px
                         , Style "width" $ attrValue 48 Percent
                         , Style "height" $ attrFunction lp Px ] -- shows callback but also demos lack of typecheck on selection...
 
 calcRadius :: AttrSetter Int Int
-calcRadius d i n e = d * 2
+calcRadius d i n e = d * 5
 
 -- an example of a typed callback function
 type ExData = { name :: String, age :: Int }
