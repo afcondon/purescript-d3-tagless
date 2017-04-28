@@ -11,7 +11,7 @@ import Data.Monoid (mempty)
 import Prelude (Unit, bind, discard, show, ($), (*), (/))
 import TaglessD3.API (D3Data(ArrayDI, ArrayD), append, applyTransition, attrs, d3Select, dataBind, enter, makeTransition, selectAll, tAttrs, tDelay, tDuration)
 import TaglessD3.AttrNew (Attr(..), AttrSetter, CssUnit(..), attrFunction, attrValue, attributes)
-import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup))
+import TaglessD3.Base (D3ElementType(..))
 import TaglessD3.D3Impl (runD3Monad, D3Script)
 import TaglessD3.StringImpl (runStructure) as S
 
@@ -23,11 +23,25 @@ circles_script = do
     dataBind myData'
     enter
     append SvgCircle
-    attrs attrList
+    attrs circleAttrs
     applyTransition $ myTransition
     tDelay $ DelayFn (\d i -> i * 100.0)
     tDuration $ DelayFn (\d i -> i * 1000.0)
-    tAttrs transitionAttrList
+    tAttrs circleTransitionAttrs
+
+rects_script :: D3Script
+rects_script = do
+    d3Select "#chart"
+    append SvgGroup
+    selectAll "rect" -- this select, the databind, the enter and the append could surely all be one function?
+    dataBind myData'
+    enter
+    append SvgRect
+    attrs rectAttrs
+    applyTransition $ myTransition
+    tDelay $ DelayFn (\d i -> i * 100.0)
+    tDuration $ DelayFn (\d i -> i * 1000.0)
+    tAttrs rectTransitionAttrs
 
 -- idempotency of d3.transtion() this next relies on D3 to return us the same
 -- transition as "name" (ie if named transition exists) allowing us to call this
@@ -41,9 +55,14 @@ myTransition = do
     makeTransition $ TransitionName "foo"
     tDelay $ MilliSec 2000.0
 
-transitionAttrList :: List Attr
-transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit
+circleTransitionAttrs :: List Attr
+circleTransitionAttrs = attributes $ [ Style "fill" $ attrValue "red" NoUnit
                                   , CY $ attrFunction (\d _ _ _ -> d * 80) Px
+                                  ]
+
+rectTransitionAttrs :: List Attr
+rectTransitionAttrs = attributes $ [ Style "fill" $ attrValue "blue" NoUnit
+                                  , X $ attrFunction (\d _ _ _ -> d * 80) Px
                                   ]
 
 myData :: forall t8. D3Data Int t8
@@ -52,8 +71,14 @@ myData       = ArrayD [1,2,3,4,5]
 myData' :: D3Data Int Number
 myData'      = ArrayDI [1,2,3,4,5,6,7,8] (\i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
-attrList :: List Attr
-attrList = attributes $ [ CX $ attrValue 200 Px
+rectAttrs :: List Attr
+rectAttrs = attributes $ [ Y $ attrValue 100 Px
+                         , X $ attrFunction (\d _ _ _ -> d * 30) Px
+                         , Width  $ attrFunction calcRadius Px
+                         , Height  $ attrFunction calcRadius Px]
+
+circleAttrs :: List Attr
+circleAttrs = attributes $ [ CX $ attrValue 200 Px
                         , CY $ attrFunction (\d _ _ _ -> d * 3) Px
                         , R  $ attrFunction calcRadius Px
                         , Style "width" $ attrValue 48 Percent
@@ -77,6 +102,7 @@ lp { name, age } _ _ _ =
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
     _ <- runD3Monad circles_script Nothing
+    _ <- runD3Monad rects_script Nothing
     log "\n\n\n====== cool beans =======\n\n\n"
     let ss = show $ S.runStructure circles_script mempty
     log ss
