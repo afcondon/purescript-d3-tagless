@@ -7,6 +7,7 @@ exports.d3TransitionFn2   = function ()                         { return d3.tran
 exports.attrFn            = function (name, value, transition)  { return transition.attr(name, value); }
 exports.attrIFn           = function (name, interp, transition) { return transition.attr(name, interp); }
 exports.durationFn        = function (ms, transition)           { return transition.duration(ms); }
+exports.durationIFn       = function (fn, transition)           { return transition.duration(fn); }
 exports.emptyFn           = function (transition)               { return transition.empty(); }
 exports.mergeFn           = function (other, transition)        { return transition.merge(other); }
 exports.namedTransitionFn = function (name, selection)          { return selection.transition(name); }

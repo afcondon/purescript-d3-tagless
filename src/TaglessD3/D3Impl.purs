@@ -9,7 +9,7 @@ import Control.Monad.Eff.Unsafe (unsafePerformEff)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
 import D3.Base (D3)
-import D3.Transition (D3Transition(..), DelaySetter(..))
+import D3.Transition (D3Transition(..), TimeSpec(..))
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple, snd)
 import TaglessD3.API (class AbstractD3API, D3Data(..))
@@ -141,11 +141,17 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
     -- tTransition  :: D3Transition  -> (m Unit)
     makeTransition t = put $ Just $ unsafePerformEff $ D3.d3Transition t
 
-    -- tDelay       :: ∀ d. DelaySetter d -> (m Unit)
+    -- tDelay       :: ∀ d. TimeSpec d -> (m Unit)
     tDelay t = do
         ms <- get
-        let t' = unsafeCoerce t
+        let t' = unsafeCoerce t -- is this coerce still needed?? TODO
         put $ (unsafePerformEff <<< D3.delay t') <$> ms
+
+    -- tDuration       :: ∀ d. TimeSpec d -> (m Unit)
+    tDuration t = do
+        ms <- get
+        let t' = unsafeCoerce t  -- is this coerce still needed?? TODO
+        put $ (unsafePerformEff <<< D3.duration t') <$> ms
 
 
 

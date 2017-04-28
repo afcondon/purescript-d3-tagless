@@ -3,20 +3,20 @@ module Main where
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3)
-import D3.Transition (D3Transition(TransitionName), DelaySetter(..), tStyle)
+import D3.Transition (D3Transition(TransitionName), TimeSpec(..), tStyle)
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
 import Prelude (Unit, bind, discard, show, ($), (*), (/))
-import TaglessD3.API (D3Data(ArrayDI, ArrayD), append, applyTransition, attrs, d3Select, dataBind, enter, makeTransition, selectAll, tAttrs, tDelay)
+import TaglessD3.API (D3Data(ArrayDI, ArrayD), append, applyTransition, attrs, d3Select, dataBind, enter, makeTransition, selectAll, tAttrs, tDelay, tDuration)
 import TaglessD3.AttrNew (Attr(..), AttrSetter, CssUnit(..), attrFunction, attrValue, attributes)
 import TaglessD3.Base (D3ElementType(SvgCircle, SvgGroup))
 import TaglessD3.D3Impl (runD3Monad, D3Script)
 import TaglessD3.StringImpl (runStructure) as S
 
-d3Script :: D3Script
-d3Script = do
+circles_script :: D3Script
+circles_script = do
     d3Select "#chart"
     append SvgGroup
     selectAll "circle" -- this select, the databind, the enter and the append could surely all be one function?
@@ -26,8 +26,7 @@ d3Script = do
     attrs attrList
     applyTransition $ myTransition
     tDelay $ DelayFn (\d i -> i * 100.0)
-    -- makeTransition $ TransitionName "foo"
-    -- tDelay $ MilliSec 2000.0
+    tDuration $ DelayFn (\d i -> i * 1000.0)
     tAttrs transitionAttrList
 
 -- idempotency of d3.transtion() this next relies on D3 to return us the same
@@ -40,8 +39,7 @@ d3Script = do
 myTransition :: D3Script
 myTransition = do
     makeTransition $ TransitionName "foo"
-    -- tDelay $ MilliSec 2000.0
-    -- tAttrs transitionAttrList
+    tDelay $ MilliSec 2000.0
 
 transitionAttrList :: List Attr
 transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit
@@ -78,7 +76,7 @@ lp { name, age } _ _ _ =
 
 main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
 main = do
-    _ <- runD3Monad d3Script Nothing
+    _ <- runD3Monad circles_script Nothing
     log "\n\n\n====== cool beans =======\n\n\n"
-    let ss = show $ S.runStructure d3Script mempty
+    let ss = show $ S.runStructure circles_script mempty
     log ss

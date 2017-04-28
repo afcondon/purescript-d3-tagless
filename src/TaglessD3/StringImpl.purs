@@ -1,6 +1,6 @@
 module TaglessD3.StringImpl where
 
-import D3.Transition (D3Transition(..), DelaySetter(..))
+import D3.Transition (D3Transition(..), TimeSpec(..))
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (class Monoid)
@@ -73,6 +73,7 @@ instance selectionDummySelection :: AbstractD3API FakeSelection where
     tSelectAll selector  = FakeSelection $ tSelectAll' selector
     makeTransition t     = FakeSelection $ makeTransition' t
     tDelay t             = FakeSelection $ tDelay' t
+    tDuration t             = FakeSelection $ tDuration' t
 
 d3Select' :: Selector -> SelectionFn Unit
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]
@@ -134,9 +135,13 @@ tSelect' selector d3s = Tuple unit $ d3s ++ ["tSelect", selector]
 tSelectAll' :: Selector -> SelectionFn Unit
 tSelectAll' selector d3s  = Tuple unit $ d3s ++ ["tSelectAll", selector]
 
-tDelay' :: ∀ d. DelaySetter d -> SelectionFn Unit
+tDelay' :: ∀ d. TimeSpec d -> SelectionFn Unit
 tDelay' (MilliSec t) d3s = Tuple unit $ d3s ++ ["Delay in ms: ", show t]
 tDelay' (DelayFn f) d3s = Tuple unit $ d3s ++ ["Delay provided as function"]
+
+tDuration' :: ∀ d. TimeSpec d -> SelectionFn Unit
+tDuration' (MilliSec t) d3s = Tuple unit $ d3s ++ ["Duration in ms: ", show t]
+tDuration' (DelayFn f) d3s = Tuple unit $ d3s ++ ["Duration provided as function"]
 
 makeTransition' :: D3Transition  -> SelectionFn Unit
 makeTransition' (TransitionName tn) d3s = Tuple unit $ d3s ++ ["Transition: ", tn]

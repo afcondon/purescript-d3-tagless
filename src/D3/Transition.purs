@@ -1,6 +1,6 @@
 module D3.Transition
   ( D3DelayFn
-  , DelaySetter(..)
+  , TimeSpec(..)
   , AttrInterpolator(..)
   -- , (Selection d)
   , D3Transition(..)
@@ -71,6 +71,7 @@ foreign import sizeFn            :: ∀ d eff.   EffFn1 (d3::D3|eff)            
 foreign import textFn            :: ∀ d v eff. EffFn2 (d3::D3|eff) v                           (Selection d) (Selection d)
 
 -- need to define types to clean these sigs up   TODO
+foreign import durationIFn       :: ∀ d eff.   EffFn2 (d3::D3|eff)    (Fn2 d Number Time)                              (Selection d) (Selection d)
 foreign import delayIFn          :: ∀ d eff.   EffFn2 (d3::D3|eff)    (Fn2 d Number Time)                              (Selection d) (Selection d)
 foreign import attrIFn           :: ∀ d v eff. EffFn3 (d3::D3|eff)    String (EffFn3 (d3::D3|eff) d Index D3Element v) (Selection d) (Selection d)
 foreign import styleIFn          :: ∀ d v eff. EffFn3 (d3::D3|eff)    String (EffFn3 (d3::D3|eff) d Index D3Element v) (Selection d) (Selection d)
@@ -84,8 +85,8 @@ foreign import savedTransitionFn :: ∀ d x eff. EffFn2 (d3::D3|eff) (Selection 
 
 type D3DelayFn d = d -> Index -> Time
 
-data DelaySetter d = MilliSec Time
-                  | DelayFn (D3DelayFn d)
+data TimeSpec d = MilliSec Time
+                | DelayFn (D3DelayFn d)
 
 data AttrInterpolator d v =
       Target v  -- straightforward target final value to tween to using built-in interpolators
@@ -119,10 +120,11 @@ namedTransition name        = runEffFn2 namedTransitionFn name
 savedTransition :: ∀ d x eff. (Selection x)        -> Selection d  -> Eff (d3::D3|eff) (Selection d)  -- changed from (s d) Eff (t d)
 savedTransition name        = runEffFn2 savedTransitionFn name
 
-duration :: ∀ d eff. Time                           -> Selection d -> Eff (d3::D3|eff) (Selection d)
-duration t                  = runEffFn2 durationFn t
+duration :: ∀ d eff. TimeSpec d                    -> Selection d -> Eff (d3::D3|eff) (Selection d)
+duration (MilliSec t)       = runEffFn2 durationFn t
+duration (DelayFn f)        = runEffFn2 durationIFn (mkFn2 f)
 
-delay :: ∀ d eff. DelaySetter d                      -> Selection d -> Eff (d3::D3|eff) (Selection d)
+delay :: ∀ d eff. TimeSpec d                      -> Selection d -> Eff (d3::D3|eff) (Selection d)
 delay (MilliSec t)          = runEffFn2 delayFn t
 delay (DelayFn f)           = runEffFn2 delayIFn (mkFn2 f)
 
