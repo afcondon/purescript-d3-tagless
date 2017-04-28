@@ -3,7 +3,7 @@ module Main where
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3)
-import D3.Transition (D3Transition(TransitionName), DelaySetter(MilliSec), tStyle)
+import D3.Transition (D3Transition(TransitionName), DelaySetter(..), tStyle)
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
@@ -24,8 +24,10 @@ d3Script = do
     enter
     append SvgCircle
     attrs attrList
-    applyTransition $ makeTransition $ TransitionName "foo"
-    tDelay $ MilliSec 2000.0
+    applyTransition $ myTransition
+    tDelay $ DelayFn (\d i -> i * 100.0)
+    -- makeTransition $ TransitionName "foo"
+    -- tDelay $ MilliSec 2000.0
     tAttrs transitionAttrList
 
 -- idempotency of d3.transtion() this next relies on D3 to return us the same
@@ -38,8 +40,8 @@ d3Script = do
 myTransition :: D3Script
 myTransition = do
     makeTransition $ TransitionName "foo"
-    tDelay $ MilliSec 2000.0
-    tAttrs transitionAttrList
+    -- tDelay $ MilliSec 2000.0
+    -- tAttrs transitionAttrList
 
 transitionAttrList :: List Attr
 transitionAttrList = attributes $ [ Style "fill" $ attrValue "red" NoUnit
