@@ -3,7 +3,7 @@ module Main where
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import D3.Base (D3)
-import D3.Transition (D3Transition(TransitionName), TimeSpec(..), tStyle)
+import D3.Transition (D3Transition(TransitionName), TimeSpec(MilliSec, DelayFn))
 import Data.Int (toNumber)
 import Data.List (List)
 import Data.Maybe (Maybe(..))
