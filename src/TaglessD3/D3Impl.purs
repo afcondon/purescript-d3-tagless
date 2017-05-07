@@ -9,14 +9,13 @@ import Control.Monad.Eff.Unsafe (unsafePerformEff)
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
 import D3.Base (D3)
-import D3.Transition (D3Transition(..), TimeSpec(..))
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple, snd)
 import TaglessD3.API (class AbstractD3API, D3Data(..))
 import TaglessD3.AttrNew (D3Attr(D3Attr))
 import Unsafe.Coerce (unsafeCoerce)
 
-type D3Script = ∀ m. (AbstractD3API m) => m Unit
+type D3Script     = ∀ m. (AbstractD3API m) => m Unit
 
 type D3State d = Maybe (D3.Selection d)
 newtype D3Monad eff d a = D3Monad (StateT (D3State d) (Eff eff) a)
@@ -111,11 +110,6 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
         ms <- get
         put $ unsafeCoerce $ (unsafePerformEff <<< (D3.dataBindHierarchy ds)) <$> ms
 
-    -- tAttrs       :: List Attr     -> (m Unit)
-    tAttrs attributes           = do -- TODO
-        ms <- get
-        put $ (unsafePerformEff <<< D3.listOfAttr attributes) <$> ms
-
     -- tMerge       :: m Unit        -> (m Unit)
     tMerge selection            = do
         ms <- get
@@ -141,14 +135,13 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
     -- tTransition  :: D3Transition  -> (m Unit)
     makeTransition t = put $ Just $ unsafePerformEff $ D3.d3Transition t
 
-    -- tDelay       :: ∀ d. TimeSpec d -> (m Unit)
-    tDelay t = do
+    delay t = do
         ms <- get
         let t' = unsafeCoerce t -- is this coerce still needed?? TODO
         put $ (unsafePerformEff <<< D3.delay t') <$> ms
 
     -- tDuration       :: ∀ d. TimeSpec d -> (m Unit)
-    tDuration t = do
+    duration t = do
         ms <- get
         let t' = unsafeCoerce t  -- is this coerce still needed?? TODO
         put $ (unsafePerformEff <<< D3.duration t') <$> ms

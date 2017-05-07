@@ -2,12 +2,11 @@ module TaglessD3.StringImpl where
 
 import D3.Transition (D3Transition(..), TimeSpec(..))
 import Data.List (List)
-import Data.Maybe (Maybe(..))
 import Data.Monoid (class Monoid)
 import Data.Profunctor.Strong (first)
 import Data.Tuple (Tuple(..), fst, snd)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Semigroup, class Show, Unit, ap, show, unit, ($), (<<<), (<>))
-import TaglessD3.API (class AbstractD3API, D3Data(..), tDelay)
+import TaglessD3.API (class AbstractD3API, D3Data(HierarchyD, HierarchyDI, ArrayD, ArrayDI))
 import TaglessD3.AttrNew (Attr, showListOfAttributes)
 import TaglessD3.Base (D3ElementType, Selector)
 
@@ -66,14 +65,13 @@ instance selectionDummySelection :: AbstractD3API FakeSelection where
     attrs attributes     = FakeSelection $ attrs' attributes
     applyTransition t    = FakeSelection $ applyTransition' t
     dataBind d           = FakeSelection $ dataBind d
-    tAttrs attributes    = FakeSelection $ tAttrs' attributes
     tMerge selection     = FakeSelection $ tMerge' selection
     tRemove              = FakeSelection $ tRemove'
     tSelect selector     = FakeSelection $ tSelect' selector
     tSelectAll selector  = FakeSelection $ tSelectAll' selector
     makeTransition t     = FakeSelection $ makeTransition' t
-    tDelay t             = FakeSelection $ tDelay' t
-    tDuration t             = FakeSelection $ tDuration' t
+    delay t             = FakeSelection $ tDelay' t
+    duration t             = FakeSelection $ tDuration' t
 
 d3Select' :: Selector -> SelectionFn Unit
 d3Select' selector d3s = Tuple unit $ d3s ++ ["D3Select", selector]

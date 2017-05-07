@@ -47,14 +47,13 @@ class (Monad m) <= AbstractD3API m where
     -- style(s) -- implemented as part of attr(s)
     -- text
 -- the methods that apply to D3 Transitions
-    tAttrs       :: List Attr     -> (m Unit)
     tMerge       :: m Unit        -> (m Unit)
     tRemove      ::                  (m Unit)
     tSelect      :: Selector      -> (m Unit)
     tSelectAll   :: Selector      -> (m Unit)
     makeTransition  :: D3Transition  -> (m Unit)
-    tDelay       :: ∀ d. TimeSpec d -> (m Unit)
-    tDuration    :: ∀ d. TimeSpec d -> (m Unit)
+    delay       :: ∀ d. TimeSpec d -> (m Unit)
+    duration    :: ∀ d. TimeSpec d -> (m Unit)
     -- the following methods on D3's transition are not currently implemented in the tagless version
         -- attrTween
         -- call
