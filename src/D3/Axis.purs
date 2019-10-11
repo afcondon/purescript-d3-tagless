@@ -13,50 +13,50 @@ module D3.Axis
 import D3.Base (D3, Eff)
 import D3.Scale (Scale)
 import D3.Selection (Selection)
-import Control.Monad.Eff.Uncurried (runEffFn2, EffFn3, runEffFn3, EffFn2, runEffFn1, EffFn1)
+import Effect.Uncurried (runEffectFn2, EffectFn3, runEffectFn3, EffectFn2, runEffectFn1, EffectFn1)
 import Data.Maybe (Maybe(Just, Nothing))
 
 foreign import data Axis :: Type -> Type
 
-foreign import d3AxisTopFn    :: ∀ d r eff. EffFn1 (d3::D3|eff) (Scale d r) (Axis d)
-foreign import d3AxisBottomFn :: ∀ d r eff. EffFn1 (d3::D3|eff) (Scale d r) (Axis d)
-foreign import d3AxisRightFn  :: ∀ d r eff. EffFn1 (d3::D3|eff) (Scale d r) (Axis d)
-foreign import d3AxisLeftFn   :: ∀ d r eff. EffFn1 (d3::D3|eff) (Scale d r) (Axis d)
+foreign import d3AxisTopFn    :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisBottomFn :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisRightFn  :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisLeftFn   :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
 
-d3AxisTop :: ∀ d r eff. Scale d r -> Eff (d3::D3|eff) (Axis d)
-d3AxisTop = runEffFn1 d3AxisTopFn
+d3AxisTop :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisTop = runEffectFn1 d3AxisTopFn
 
-d3AxisBottom :: ∀ d r eff. Scale d r -> Eff (d3::D3|eff) (Axis d)
-d3AxisBottom = runEffFn1 d3AxisBottomFn
+d3AxisBottom :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisBottom = runEffectFn1 d3AxisBottomFn
 
-d3AxisRight :: ∀ d r eff. Scale d r -> Eff (d3::D3|eff) (Axis d)
-d3AxisRight = runEffFn1 d3AxisRightFn
+d3AxisRight :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisRight = runEffectFn1 d3AxisRightFn
 
-d3AxisLeft :: ∀ d r eff. Scale d r -> Eff (d3::D3|eff) (Axis d)
-d3AxisLeft = runEffFn1 d3AxisLeftFn
+d3AxisLeft :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisLeft = runEffectFn1 d3AxisLeftFn
 
-foreign import d3AxisTicksCountFn     :: ∀ d eff. EffFn2 (d3::D3|eff) Number (Axis d)        (Axis d)
-foreign import d3AxisTicksCountSFn    :: ∀ d eff. EffFn3 (d3::D3|eff) Number String (Axis d) (Axis d)
-foreign import d3AxisTicksIntervalFn  :: ∀ d eff. EffFn2 (d3::D3|eff) Number (Axis d)        (Axis d)
-foreign import d3AxisTicksIntervalSFn :: ∀ d eff. EffFn3 (d3::D3|eff) Number String (Axis d) (Axis d)
+foreign import d3AxisTicksCountFn     :: ∀ d eff. EffectFn2 Number (Axis d)        (Axis d)
+foreign import d3AxisTicksCountSFn    :: ∀ d eff. EffectFn3 Number String (Axis d) (Axis d)
+foreign import d3AxisTicksIntervalFn  :: ∀ d eff. EffectFn2 Number (Axis d)        (Axis d)
+foreign import d3AxisTicksIntervalSFn :: ∀ d eff. EffectFn3 Number String (Axis d) (Axis d)
 
 data TickParams = Count Number (Maybe String)
                  | Interval Number (Maybe String)  -- there are more possibilities here to write TODO
 
-axisTicks :: ∀ d eff. TickParams -> Axis d -> Eff (d3::D3|eff) (Axis d)
-axisTicks (Count n Nothing)     = runEffFn2 d3AxisTicksCountFn n
-axisTicks (Count n (Just s))    = runEffFn3 d3AxisTicksCountSFn n s
-axisTicks (Interval i Nothing)  = runEffFn2 d3AxisTicksIntervalFn i
-axisTicks (Interval i (Just s)) = runEffFn3 d3AxisTicksIntervalSFn i s
+axisTicks :: ∀ d eff. TickParams -> Axis d -> Effect (Axis d)
+axisTicks (Count n Nothing)     = runEffectFn2 d3AxisTicksCountFn n
+axisTicks (Count n (Just s))    = runEffectFn3 d3AxisTicksCountSFn n s
+axisTicks (Interval i Nothing)  = runEffectFn2 d3AxisTicksIntervalFn i
+axisTicks (Interval i (Just s)) = runEffectFn3 d3AxisTicksIntervalSFn i s
 
 
 -- | pretty sure this is unnecessary - didn't i implement all those selection
 -- call functions for a reason? however, just want to get this axis working
 -- right now and revisit TODO
-foreign import renderAxisFn :: ∀ d a eff. EffFn2 (d3::D3|eff) (Axis a) (Selection d) (Selection d)
+foreign import renderAxisFn :: ∀ d a eff. EffectFn2 (Axis a) (Selection d) (Selection d)
 
-renderAxis :: ∀ a d eff. Axis a -> Selection d -> Eff (d3::D3|eff) (Selection d)
-renderAxis = runEffFn2 renderAxisFn
+renderAxis :: ∀ a d eff. Axis a -> Selection d -> Effect (Selection d)
+renderAxis = runEffectFn2 renderAxisFn
 
 -- # axis.ticks(arguments…) <>
 -- # axis.ticks([count[, specifier]])

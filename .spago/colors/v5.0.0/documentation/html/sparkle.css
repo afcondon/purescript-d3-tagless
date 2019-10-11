@@ -1,0 +1,135 @@
+.sparkle-test pre,
+.sparkle-test code,
+.sparkle-test input,
+.sparkle-test label,
+.sparkle-test legend,
+.sparkle-test select,
+.sparkle-test textarea {
+    font-family: 'Source Code Pro', monospace;
+}
+
+fieldset.sparkle-test {
+    margin-top: 15px;
+    margin-bottom: 40px;
+    max-width: 800px;
+    border: 1px solid #666;
+    border-radius: 3px;
+}
+
+fieldset.sparkle-test > legend {
+    background-color: #f0f0f0;
+    border: 1px solid #666;
+    border-radius: 3px;
+}
+
+.sparkle-test pre {
+    background-color: #f0f0f0;
+    padding: 10px;
+    max-width: 780px;
+
+    /* http://stackoverflow.com/a/248013/704831 */
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.sparkle-test .flare-input {
+    margin-bottom: 5px;
+}
+
+.sparkle-test input:not([type="range"]) {
+    padding: 3px;
+    border-radius: 3px;
+    border: 1px solid #888;
+}
+
+.sparkle-test input:invalid {
+    background-color: #DEAFB4;
+}
+
+.sparkle-test .flare-input-number,
+.sparkle-test .flare-input-int-number {
+    width: 80px;
+}
+
+.sparkle-test fieldset {
+    border-radius: 3px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.sparkle-test label {
+    width: 160px;
+    display: inline-block;
+}
+
+.sparkle-test legend {
+    padding: 2px 6px;
+    font-weight: 700;
+}
+
+.sparkle-test .flare-input-list button {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.sparkle-test .sparkle-okay {
+    background-color: #B4DEAF;
+}
+
+.sparkle-test .sparkle-warn {
+    background-color: #DEAFB4;
+}
+
+.sparkle-string {
+    color: #E91E63;
+}
+
+.sparkle-number {
+    color: #1339E8;
+}
+
+.sparkle-boolean {
+    font-weight: bold;
+}
+
+.sparkle-constructor {
+    font-weight: bold;
+}
+
+.sparkle-record-field {
+    font-style: italic;
+}
+
+.sparkle-color {
+    width: 1em;
+    height: 1em;
+    margin-right: 0.5em;
+    display: inline-block;
+}
+
+.sparkle-tooltip {
+    cursor: default;
+}
+
+.sparkle-tooltip:hover {
+    background-color: #f2e7a6;
+}
+
+.sparkle-tooltip > .sparkle-tooltip:hover {
+    background-color: #e9d563;
+}
+
+.sparkle-tooltip > .sparkle-tooltip > .sparkle-tooltip:hover {
+    background-color: #dfc220;
+}
+
+.sparkle-tooltip > .sparkle-tooltip > .sparkle-tooltip > .sparkle-tooltip:hover {
+    background-color: #938015;
+}
+
+.sparkle-tooltip > .sparkle-tooltip > .sparkle-tooltip > .sparkle-tooltip > .sparkle-tooltip:hover {
+    background-color: #62560e;
+}

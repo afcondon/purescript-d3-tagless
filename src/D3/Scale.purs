@@ -24,10 +24,10 @@ module D3.Scale
   , ticks
   ) where
 
-import Control.Monad.Eff (Eff)
+import Effect
 import D3.Base (D3)
 import D3.Collections
-import Control.Monad.Eff.Uncurried (runEffFn2, runEffFn3, runEffFn1, EffFn2, EffFn3, EffFn1)
+import Effect.Uncurried (runEffFn2, runEffFn3, runEffFn1, EffFn2, EffFn3, EffFn1)
 import Data.Maybe (Maybe(..))
 
 foreign import data Scale :: Type -> Type -> Type

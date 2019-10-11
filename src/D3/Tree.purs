@@ -1,8 +1,8 @@
 module D3.Tree where
 
 import Prelude
-import D3.Base (D3, Eff)
-import Control.Monad.Eff.Uncurried (mkEffFn2, EffFn1, runEffFn1, runEffFn2, EffFn2)
+import Effect
+import Effect.Uncurried (mkEffectFn2, EffectFn1, runEffectFn1, runEffectFn2, EffectFn2)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
 
@@ -22,89 +22,89 @@ type HierarchyNode d = {
   , y        :: Number
 }
 
-foreign import d3HierarchyFn :: ∀ d eff. EffFn1 (d3::D3|eff) (Array d)                    (HierarchyNode d)
-foreign import d3TreeFn      :: ∀ eff.   Eff (d3::D3|eff)                                 D3Tree
-foreign import sizeFn        :: ∀ eff.   EffFn2 (d3::D3|eff) (Array Number) D3Tree        D3Tree
-foreign import nodeSizeFn    :: ∀ eff.   EffFn2 (d3::D3|eff) (Array Number) D3Tree        D3Tree
-foreign import separationFn  :: ∀ d eff. EffFn2 (d3::D3|eff)
-                                                (EffFn2 (d3::D3|eff) (HierarchyNode d) (HierarchyNode d) Number)
-                                                D3Tree
-                                                D3Tree
-foreign import hierarchizeFn :: ∀ d eff. EffFn2 (d3::D3|eff) (Array d) D3Hierarchy        (HierarchyNode d)
-foreign import treeFn        :: ∀ d eff. EffFn2 (d3::D3|eff) (HierarchyNode d) D3Tree     (HierarchyNode d)
+foreign import d3HierarchyFn :: forall d. EffectFn1 (Array d)         (HierarchyNode d)
+foreign import d3TreeFn      :: Effect                                 D3Tree
+foreign import sizeFn        :: EffectFn2 (Array Number) D3Tree        D3Tree
+foreign import nodeSizeFn    :: EffectFn2 (Array Number) D3Tree        D3Tree
+foreign import separationFn  :: forall d. EffectFn2
+                                          (EffectFn2 (HierarchyNode d) (HierarchyNode d) Number)
+                                          D3Tree
+                                          D3Tree
+foreign import hierarchizeFn :: forall d. EffectFn2 (Array d) D3Hierarchy        (HierarchyNode d)
+foreign import treeFn        :: forall d. EffectFn2 (HierarchyNode d) D3Tree     (HierarchyNode d)
 
-foreign import hasChildrenFn :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)                            Boolean
-foreign import ancestorsFn   :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)            (Array (HierarchyNode d))
-foreign import descendantsFn :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)            (Array (HierarchyNode d))
--- foreign import eachFn        :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)
--- foreign import eachAfterFn   :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)
--- foreign import eachBeforeFn  :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)
-foreign import leavesFn      :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)            (Array (HierarchyNode d))
-foreign import linksFn       :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)            (Array (HierarchyLink d))
--- foreign import pathFn        :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)
--- foreign import sortFn        :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)
-foreign import sumFn         :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)                              Number
-foreign import childrenFn    :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)            (Array (HierarchyNode d))
-foreign import parentFn      :: ∀ d eff. EffFn1 (d3::D3|eff) (HierarchyNode d)         (Nullable (HierarchyNode d))
+foreign import hasChildrenFn :: forall d. EffectFn1 (HierarchyNode d)            Boolean
+foreign import ancestorsFn   :: forall d. EffectFn1 (HierarchyNode d)            (Array (HierarchyNode d))
+foreign import descendantsFn :: forall d. EffectFn1 (HierarchyNode d)            (Array (HierarchyNode d))
+-- foreign import eachFn        :: forall d. EffectFn1 (HierarchyNode d)
+-- foreign import eachAfterFn   :: forall d. EffectFn1 (HierarchyNode d)
+-- foreign import eachBeforeFn  :: forall d. EffectFn1 (HierarchyNode d)
+foreign import leavesFn      :: forall d. EffectFn1 (HierarchyNode d)            (Array (HierarchyNode d))
+foreign import linksFn       :: forall d. EffectFn1 (HierarchyNode d)            (Array (HierarchyLink d))
+-- foreign import pathFn        :: forall d. EffectFn1 (HierarchyNode d)
+-- foreign import sortFn        :: forall d. EffectFn1 (HierarchyNode d)
+foreign import sumFn         :: forall d. EffectFn1 (HierarchyNode d)                              Number
+foreign import childrenFn    :: forall d. EffectFn1 (HierarchyNode d)            (Array (HierarchyNode d))
+foreign import parentFn      :: forall d. EffectFn1 (HierarchyNode d)         (Nullable (HierarchyNode d))
 foreign import parentsEqFn   :: ∀ d. HierarchyNode d -> HierarchyNode d -> Boolean
 
 -- no version yet to take the children accessor function
-d3Hierarchy :: ∀ d eff. Array d -> Eff (d3::D3|eff) (HierarchyNode d)
-d3Hierarchy = runEffFn1 d3HierarchyFn
+d3Hierarchy :: forall d. Array d -> Effect (HierarchyNode d)
+d3Hierarchy = runEffectFn1 d3HierarchyFn
 
-d3Tree :: ∀ eff. Eff (d3::D3|eff) D3Tree
+d3Tree :: Effect D3Tree
 d3Tree = d3TreeFn
 
-hierarchize :: ∀ d eff. Array d -> D3Hierarchy -> Eff (d3::D3|eff) (HierarchyNode d)
-hierarchize = runEffFn2 hierarchizeFn
+hierarchize :: forall d. Array d -> D3Hierarchy -> Effect (HierarchyNode d)
+hierarchize = runEffectFn2 hierarchizeFn
 
-size :: ∀ eff. Number -> Number -> D3Tree -> Eff (d3::D3|eff) D3Tree
-size width height = runEffFn2 sizeFn [width, height]
+size :: Number -> Number -> D3Tree -> Effect D3Tree
+size width height = runEffectFn2 sizeFn [width, height]
 
-nodeSize :: ∀ eff. Number -> Number -> D3Tree -> Eff (d3::D3|eff) D3Tree
-nodeSize width height = runEffFn2 nodeSizeFn [width, height]
+nodeSize :: Number -> Number -> D3Tree -> Effect D3Tree
+nodeSize width height = runEffectFn2 nodeSizeFn [width, height]
 
 -- || functions on the Tree Layout
 
 -- d3.tree()()    tree as function, lays out HierarchyNodes as a Tree
-layoutTree :: ∀ d eff. HierarchyNode d -> D3Tree -> Eff (d3::D3|eff) (HierarchyNode d)
-layoutTree = runEffFn2 treeFn
+layoutTree :: forall d. HierarchyNode d -> D3Tree -> Effect (HierarchyNode d)
+layoutTree = runEffectFn2 treeFn
 
 -- || functions on HierarchyNodes
-ancestors   :: ∀ d eff. HierarchyNode d   -> Eff (d3::D3|eff) (Array (HierarchyNode d))
-ancestors   = runEffFn1 ancestorsFn
+ancestors   :: forall d. HierarchyNode d   -> Effect (Array (HierarchyNode d))
+ancestors   = runEffectFn1 ancestorsFn
 
-descendants :: ∀ d eff. HierarchyNode d -> Eff (d3::D3|eff) (Array (HierarchyNode d))
-descendants  = runEffFn1 descendantsFn
+descendants :: forall d. HierarchyNode d -> Effect (Array (HierarchyNode d))
+descendants  = runEffectFn1 descendantsFn
 
-leaves      :: ∀ d eff. HierarchyNode d  -> Eff (d3::D3|eff) (Array (HierarchyNode d))
-leaves      = runEffFn1 leavesFn
+leaves      :: forall d. HierarchyNode d  -> Effect (Array (HierarchyNode d))
+leaves      = runEffectFn1 leavesFn
 
-links       :: ∀ d eff. HierarchyNode d -> Eff (d3::D3|eff) (Array (HierarchyLink d))
-links       = runEffFn1 linksFn
+links       :: forall d. HierarchyNode d -> Effect (Array (HierarchyLink d))
+links       = runEffectFn1 linksFn
 
-sum         :: ∀ d eff. HierarchyNode d -> Eff (d3::D3|eff) Number
-sum         = runEffFn1 sumFn
+sum         :: forall d. HierarchyNode d -> Effect Number
+sum         = runEffectFn1 sumFn
 
-separation  :: ∀ d eff. (HierarchyNode d -> HierarchyNode d -> Eff (d3::D3|eff) Number) -> D3Tree -> Eff (d3::D3|eff) D3Tree
-separation f = runEffFn2 separationFn (mkEffFn2 f)
+separation  :: forall d. (HierarchyNode d -> HierarchyNode d -> Effect Number) -> D3Tree -> Effect D3Tree
+separation f = runEffectFn2 separationFn (mkEffectFn2 f)
 
 -- || function in lieu of testing null on the array of children
-hasChildren :: ∀ d eff. HierarchyNode d -> Eff (d3::D3|eff) Boolean
-hasChildren = runEffFn1 hasChildrenFn
+hasChildren :: forall d. HierarchyNode d -> Effect Boolean
+hasChildren = runEffectFn1 hasChildrenFn
 
 -- functions to provide access to the parents and children without circular ref in the definition
-children :: ∀ d eff. HierarchyNode d -> Eff (d3::D3|eff) (Array (HierarchyNode d))
-children = runEffFn1 childrenFn
+children :: forall d. HierarchyNode d -> Effect (Array (HierarchyNode d))
+children = runEffectFn1 childrenFn
 
-parent  :: ∀ d eff. HierarchyNode d -> Eff (d3::D3|eff) (Maybe (HierarchyNode d))
-parent node = toMaybe <$> runEffFn1 parentFn node
+parent  :: forall d. HierarchyNode d -> Effect (Maybe (HierarchyNode d))
+parent node = toMaybe <$> runEffectFn1 parentFn node
 
 parentsEq  :: ∀ d. HierarchyNode d -> HierarchyNode d -> Boolean
 parentsEq  = parentsEqFn
 
--- each :: ∀ d eff. HierarchyNode d  ->
--- eachAfter :: ∀ d eff. HierarchyNode d ->
--- eachBefore :: ∀ d eff. HierarchyNode d  ->
--- path :: ∀ d eff. HierarchyNode d  ->
--- sort :: ∀ d eff. HierarchyNode d  ->
+-- each :: forall d. HierarchyNode d  ->
+-- eachAfter :: forall d. HierarchyNode d ->
+-- eachBefore :: forall d. HierarchyNode d  ->
+-- path :: forall d. HierarchyNode d  ->
+-- sort :: forall d. HierarchyNode d  ->

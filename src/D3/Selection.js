@@ -104,7 +104,7 @@ exports.textFn      = function (text, selection)         {
 exports.textFnFn    = function (fn, selection)           {
     return selection.text(fn); }
 
-// custom version of mkEffFn1 which passes a row containing data including element and 'this'
+// custom version of mkEffectFn1 which passes a row containing data including element and 'this'
 // enables callbacks in the D3 style which rely on 'this' for access to the D3Element associated with the datum
 exports.onFn =
   function (selection, eventType, callback) {

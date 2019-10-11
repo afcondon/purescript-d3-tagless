@@ -1,8 +1,7 @@
 module Main where
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, logShow)
-import D3.Base (D3)
+import Effect
+import Effect.Class.Console (logShow)
 import D3.Transition (D3Transition(TransitionName), TimeSpec(MilliSec))
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
@@ -23,7 +22,7 @@ myTransition = do
 myData' :: D3Data Int Number
 myData' = ArrayDI [1,2,3,4,5,6,7,8] (\i -> (toNumber i) / 2.0) -- array data with lambda index fn
 
-main :: forall e. Eff (console :: CONSOLE, d3 :: D3 | e) Unit
+main :: Effect Unit
 main = do
     _ <- runD3Monad (Circles.script myData' myTransition) Nothing
     _ <- runD3Monad (Rectangles.script myData' myTransition) Nothing

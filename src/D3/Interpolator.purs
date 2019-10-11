@@ -7,11 +7,12 @@ module D3.Interpolator
   , D3TweenTarget
   , D3EffTweenFn
   , D3EffTweenTarget
-  -- , mkTweenTargetEffFn
-  -- , mkTweenFunctionEffFn
+  -- , mkTweenTargetEffectFn
+  -- , mkTweenFunctionEffectFn
   ) where
 
-import D3.Base (D3, kind Effect, Eff, D3Element)
+import Effect
+import D3.Base (D3Element)
 type Time  = Number
 type Index = Number
 
@@ -20,10 +21,10 @@ foreign import data D3EffTweenTarget ::     # Effect -> Type -> Type -> Type -> 
 type D3TweenTargetUncurried v d = ∀ eff.
                   D3EffTweenTarget (d3::D3|eff)    d    Index     D3Element                     v
 type D3TweenTarget          v d = ∀ eff.
-                                                  (d -> Index ->  D3Element -> Eff (d3::D3|eff) v)
+                                                  (d -> Index ->  D3Element -> Effect v)
 
 foreign import data D3EffTweenFn ::     # Effect -> Type -> Type -> Type -> Type -> Type
 type D3TweenFnUncurried v d = ∀ eff.
                   D3EffTweenFn (d3::D3|eff)    d    Index     D3Element                     (Time -> v)
 type D3TweenFn          v d = ∀ eff.
-                                              (d -> Index -> D3Element -> Eff (d3::D3|eff) (Time -> v))
+                                              (d -> Index -> D3Element -> Effect (Time -> v))

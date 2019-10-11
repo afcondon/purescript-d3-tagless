@@ -3,12 +3,9 @@ module TaglessD3.D3Impl where
 import Prelude
 import D3.Selection as D3
 import D3.Transition as D3
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Class (class MonadEff)
-import Control.Monad.Eff.Unsafe (unsafePerformEff)
+import Effect
 import Control.Monad.State (class MonadState)
 import Control.Monad.State.Trans (StateT, get, put, runStateT)
-import D3.Base (D3)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple, snd)
 import TaglessD3.API (class AbstractD3API, D3Data(..))
@@ -26,7 +23,6 @@ derive newtype instance applyD3Monad       :: Apply             (D3Monad eff d)
 derive newtype instance applicativeD3Monad :: Applicative       (D3Monad eff d)
 derive newtype instance bindD3Monad        :: Bind              (D3Monad eff d)
 derive newtype instance monadD3Monad       :: Monad             (D3Monad eff d)
-derive newtype instance monadEffD3Monad    :: MonadEff   eff    (D3Monad eff d)
 derive newtype instance monadStateD3Monad  :: MonadState (Maybe (D3.Selection d)) (D3Monad eff d)
 
 runD3Monad :: ∀ eff d a. D3Monad eff d a -> Maybe (D3.Selection d) -> Eff eff (Tuple a (D3State d))
@@ -90,8 +86,8 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
 -- in API.purs
     -- applyTransition  :: (m Unit)  -> (m Unit)
 -- in D3.Transition.purs
-    -- d3Transition :: ∀ eff d. D3Transition -> Eff (d3::D3|eff) (Selection d)
-    -- addTransition :: ∀ d eff.  String -> Selection d  -> Eff (d3::D3|eff) (Selection d)
+    -- d3Transition :: ∀ eff d. D3Transition -> Effect (Selection d)
+    -- addTransition :: ∀ d eff.  String -> Selection d  -> Effect (Selection d)
 
     -- dataBind :: ∀ d i. D3Data d i -> (m Unit)
     dataBind (ArrayDI ds k) = do
@@ -149,7 +145,7 @@ instance selectionDummySelection :: AbstractD3API (D3Monad eff d) where
 
 
 class RunD3 a where
-  runD3 :: ∀ e. a -> Eff (d3 :: D3 | e) Unit
+  runD3 :: ∀ e. a -> Effect Unit
 
 instance rund3D3Attr :: RunD3 (D3Attr a) where
   runD3 (D3Attr { value, showValue }) = pure unit

@@ -1,11 +1,11 @@
 module D3.Event where
 
 
-import Control.Monad.Eff (Eff)
+import Effect
 import D3.Base (D3)
-import DOM.Event.Types (Event, TouchEvent)
-import DOM.HTML.Types (HTMLElement)
-import Control.Monad.Eff.Uncurried (runEffFn3, runEffFn1, EffFn3, EffFn1, EffFn2, runEffFn2)
+import Web.Event.Event (Event, TouchEvent)
+import Web.HTML.HTMLElement (HTMLElement)
+import Effect.Uncurried (runEffFn3, runEffFn1, EffFn3, EffFn1, EffFn2, runEffFn2)
 import Data.Nullable (Nullable)
 import Prelude (Unit)
 

@@ -31,10 +31,10 @@ module D3.Selection
   , transition
   ) where
 
-import Control.Monad.Eff (Eff, kind Effect)
-import Control.Monad.Eff.Uncurried (EffFn1, EffFn2, EffFn3, EffFn4, EffFn5, runEffFn1, runEffFn2, runEffFn3, runEffFn5)
-import D3.Base (D3, D3Element, Hierarchy, Index)
-import DOM.Event.Types (EventType)
+import Effect
+import Effect.Uncurried (EffectFn1, EffectFn2, EffectFn3, EffectFn4, EffectFn5, runEffectFn1, runEffectFn2, runEffectFn3, runEffectFn5)
+import D3.Base (D3Element, Hierarchy, Index)
+import Web.Event.Event (EventType)
 import Data.List (List(..), foldM)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe, Nullable)
@@ -44,203 +44,203 @@ import TaglessD3.AttrNew (Attr(..), getTag)
 foreign import data Selection :: Type -> Type
 
 -- missing SelectFnFn which takes a predicate fn to perform the selection
-foreign import appendFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
-foreign import bindDataFn    :: ∀ d1 d2 eff.  EffFn2 (d3::D3|eff) (Array d2)                  (Selection d1) (Selection d2)
-foreign import bindDataFnK   :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Array d2) (d2 -> k)       (Selection d1) (Selection d2)
-foreign import bindHierarchyFn  :: ∀ d1 d2 eff.   EffFn2 (d3::D3|eff) (Hierarchy d2)          (Selection d1) (Selection d2)
-foreign import bindHierarchyFnK :: ∀ d1 d2 k eff. EffFn3 (d3::D3|eff) (Hierarchy d2) (d2 -> k) (Selection d1)(Selection d2)
-foreign import d3SelectAllFn :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                     (Selection d)
-foreign import d3SelectFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) String                                     (Selection d)
-foreign import emptyFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) Boolean
-foreign import enterFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
-foreign import exitFn        :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
-foreign import filterFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
-foreign import filterFnP     :: ∀ d eff.      EffFn2 (d3::D3|eff) (d -> Boolean)              (Selection d) (Selection d)
-foreign import getAttrFn     :: ∀ v d eff.    EffFn2 (d3::D3|eff) String                      (Selection d) v
-foreign import insertFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
-foreign import mergeFn       :: ∀ d eff.      EffFn2 (d3::D3|eff) (Selection d)               (Selection d) (Selection d)
-foreign import transitionFn  :: ∀ d eff.      EffFn2 (d3::D3|eff) (Selection d)               (Selection d) (Selection d)
-foreign import nodeFn        :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Nullable D3Element)
-foreign import nodesFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Array D3Element)
-foreign import orderFn       :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
-foreign import removeFn      :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) (Selection d)
-foreign import selectAllFn   :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
-foreign import selectElFn    :: ∀ d eff.      EffFn1 (d3::D3|eff) D3Element                                 (Selection d) -- is this really in D3? TODO
-foreign import selectFn      :: ∀ d eff.      EffFn2 (d3::D3|eff) String                      (Selection d) (Selection d)
-foreign import sizeFn        :: ∀ d eff.      EffFn1 (d3::D3|eff)                             (Selection d) Int
+foreign import appendFn      :: ∀ d eff.      EffectFn2 String                      (Selection d) (Selection d)
+foreign import bindDataFn    :: ∀ d1 d2 eff.  EffectFn2 (Array d2)                  (Selection d1) (Selection d2)
+foreign import bindDataFnK   :: ∀ d1 d2 k eff. EffectFn3 (Array d2) (d2 -> k)       (Selection d1) (Selection d2)
+foreign import bindHierarchyFn  :: ∀ d1 d2 eff.   EffectFn2 (Hierarchy d2)          (Selection d1) (Selection d2)
+foreign import bindHierarchyFnK :: ∀ d1 d2 k eff. EffectFn3 (Hierarchy d2) (d2 -> k) (Selection d1)(Selection d2)
+foreign import d3SelectAllFn :: ∀ d eff.      EffectFn1 String                                     (Selection d)
+foreign import d3SelectFn    :: ∀ d eff.      EffectFn1 String                                     (Selection d)
+foreign import emptyFn       :: ∀ d eff.      EffectFn1                             (Selection d) Boolean
+foreign import enterFn       :: ∀ d eff.      EffectFn1                             (Selection d) (Selection d)
+foreign import exitFn        :: ∀ d eff.      EffectFn1                             (Selection d) (Selection d)
+foreign import filterFn      :: ∀ d eff.      EffectFn2 String                      (Selection d) (Selection d)
+foreign import filterFnP     :: ∀ d eff.      EffectFn2 (d -> Boolean)              (Selection d) (Selection d)
+foreign import getAttrFn     :: ∀ v d eff.    EffectFn2 String                      (Selection d) v
+foreign import insertFn      :: ∀ d eff.      EffectFn2 String                      (Selection d) (Selection d)
+foreign import mergeFn       :: ∀ d eff.      EffectFn2 (Selection d)               (Selection d) (Selection d)
+foreign import transitionFn  :: ∀ d eff.      EffectFn2 (Selection d)               (Selection d) (Selection d)
+foreign import nodeFn        :: ∀ d eff.      EffectFn1                             (Selection d) (Nullable D3Element)
+foreign import nodesFn       :: ∀ d eff.      EffectFn1                             (Selection d) (Array D3Element)
+foreign import orderFn       :: ∀ d eff.      EffectFn1                             (Selection d) (Selection d)
+foreign import removeFn      :: ∀ d eff.      EffectFn1                             (Selection d) (Selection d)
+foreign import selectAllFn   :: ∀ d eff.      EffectFn2 String                      (Selection d) (Selection d)
+foreign import selectElFn    :: ∀ d eff.      EffectFn1 D3Element                                 (Selection d) -- is this really in D3? TODO
+foreign import selectFn      :: ∀ d eff.      EffectFn2 String                      (Selection d) (Selection d)
+foreign import sizeFn        :: ∀ d eff.      EffectFn1                             (Selection d) Int
 
-type D3CallbackDINE eff d r = (EffFn4 (d3::D3|eff)     -- eff
+type D3CallbackDINE eff d r = (EffectFn4     -- eff
                                    d                 -- 1st arg of callback
                                    Number            -- 2nd arg of callback
                                    (Array D3Element) -- 3rd arg of callback
                                    D3Element         -- 4th arg of callback
                                    r)                -- result of callback
 
-type D3CallbackText v eff = (EffFn2 (d3::D3|eff)    -- eff
+type D3CallbackText v eff = (EffectFn2    -- eff
                                       v              -- 1st arg of callback
                                       Index          -- 2nd arg of callback
                                       String)        -- result of callback, a style
 
 
 -- these foreign functions come in two flavors, simple versions and callback versions
-foreign import classedFn  :: ∀ d eff. EffFn3 (d3::D3|eff) String Boolean (Selection d) (Selection d)
-foreign import classedFnP :: ∀ d eff. EffFn3 (d3::D3|eff)         -- eff
+foreign import classedFn  :: ∀ d eff. EffectFn3 String Boolean (Selection d) (Selection d)
+foreign import classedFnP :: ∀ d eff. EffectFn3         -- eff
                                              String               -- 1st arg of classedFnP
                                             (D3CallbackDINE eff d Boolean)  -- 2nd arg is callback
                                             (Selection d)             -- 3rd arg
                                             (Selection d)             -- result
 
-foreign import styleFn   :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
-foreign import attrFn  :: ∀ d v eff. EffFn3 (d3::D3|eff) String v (Selection d) (Selection d)
+foreign import styleFn   :: ∀ d v eff. EffectFn3 String v (Selection d) (Selection d)
+foreign import attrFn  :: ∀ d v eff. EffectFn3 String v (Selection d) (Selection d)
 
 -- | turrrrrns out this is a Nullable value TODO
-getAttr :: ∀ v d eff. String                       -> Selection d -> Eff (d3::D3|eff) v
-getAttr s                    = runEffFn2 getAttrFn  s
+getAttr :: ∀ v d eff. String                       -> Selection d -> Effect v
+getAttr s                    = runEffectFn2 getAttrFn  s
 
-listOfAttr :: ∀ eff d. List Attr -> Selection d -> Eff (d3::D3|eff) (Selection d)
+listOfAttr :: ∀ eff d. List Attr -> Selection d -> Effect (Selection d)
 listOfAttr Nil s = pure s
 listOfAttr as s = do
     s' <- arrayOfSelections
     pure s'
     where
         arrayOfSelections = foldM applyAttr s as
-        applyAttr :: Selection d -> Attr -> Eff (d3::D3|eff) (Selection d)
+        applyAttr :: Selection d -> Attr -> Effect (Selection d)
         applyAttr sel at =
             case at of
-            (Style stylename _) -> runEffFn3 styleFn stylename at sel
-            _ ->  runEffFn3 attrFn (getTag at) at sel
+            (Style stylename _) -> runEffectFn3 styleFn stylename at sel
+            _ ->  runEffectFn3 attrFn (getTag at) at sel
 
-d3Select :: ∀ d eff. String -> Eff (d3::D3|eff) (Selection d)
-d3Select selector = runEffFn1 d3SelectFn selector
+d3Select :: ∀ d eff. String -> Effect (Selection d)
+d3Select selector = runEffectFn1 d3SelectFn selector
 
-d3SelectAll :: ∀ d eff. String -> Eff (d3::D3|eff) (Selection d)
-d3SelectAll selector = runEffFn1 d3SelectAllFn selector
+d3SelectAll :: ∀ d eff. String -> Effect (Selection d)
+d3SelectAll selector = runEffectFn1 d3SelectAllFn selector
 
-selectAll :: ∀ d eff. String -> Selection d -> Eff (d3::D3|eff) (Selection d)
-selectAll selector = runEffFn2 selectAllFn selector
+selectAll :: ∀ d eff. String -> Selection d -> Effect (Selection d)
+selectAll selector = runEffectFn2 selectAllFn selector
 
-selectElem :: ∀ d eff. D3Element -> Eff (d3::D3|eff) (Selection d)  -- think this doesn't actually exist...TODO
-selectElem element = runEffFn1 selectElFn element
+selectElem :: ∀ d eff. D3Element -> Effect (Selection d)  -- think this doesn't actually exist...TODO
+selectElem element = runEffectFn1 selectElFn element
 
-select  :: ∀ d eff.  String -> Selection d -> Eff (d3::D3|eff) (Selection d)
-select selector = runEffFn2 selectFn selector
+select  :: ∀ d eff.  String -> Selection d -> Effect (Selection d)
+select selector = runEffectFn2 selectFn selector
 
 -- would be nice to express that Keyed needs k to be Ord, will have to wait for GADTs
--- dataBind :: ∀ d k eff. Ord k => DataBind d k    -> Selection d -> Eff (d3::D3|eff) (Selection d)
+-- dataBind :: ∀ d k eff. Ord k => DataBind d k    -> Selection d -> Effect (Selection d)
 dataBindArray :: forall eff d2 d1. Array d2 -> Selection d1 -> Eff ( d3 :: D3 | eff ) (Selection d2)
-dataBindArray d         = runEffFn2 bindDataFn d
+dataBindArray d         = runEffectFn2 bindDataFn d
 
-dataBindIndexArray :: ∀ d1 d2 k eff. Array d2 -> (d2 -> k) -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
-dataBindIndexArray d keyFn   = runEffFn3 bindDataFnK d keyFn
+dataBindIndexArray :: ∀ d1 d2 k eff. Array d2 -> (d2 -> k) -> Selection d1 -> Effect (Selection d2)
+dataBindIndexArray d keyFn   = runEffectFn3 bindDataFnK d keyFn
 
-dataBindHierarchy :: ∀ d1 d2 eff. Hierarchy d2           -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
-dataBindHierarchy h         = runEffFn2 bindHierarchyFn h
+dataBindHierarchy :: ∀ d1 d2 eff. Hierarchy d2           -> Selection d1 -> Effect (Selection d2)
+dataBindHierarchy h         = runEffectFn2 bindHierarchyFn h
 
-dataBindIndexHierarchy :: ∀ d1 d2 k eff. Hierarchy d2 -> (d2 -> k)            -> Selection d1 -> Eff (d3::D3|eff) (Selection d2)
-dataBindIndexHierarchy h keyFn  = runEffFn3 bindHierarchyFnK h keyFn
+dataBindIndexHierarchy :: ∀ d1 d2 k eff. Hierarchy d2 -> (d2 -> k)            -> Selection d1 -> Effect (Selection d2)
+dataBindIndexHierarchy h keyFn  = runEffectFn3 bindHierarchyFnK h keyFn
 
--- filter  :: ∀ d eff.  Filter d                   -> Selection d -> Eff (d3::D3|eff) (Selection d)
--- filter (Selector s)       = runEffFn2 filterFn s
--- filter (Predicate p)      = runEffFn2 filterFnP p
+-- filter  :: ∀ d eff.  Filter d                   -> Selection d -> Effect (Selection d)
+-- filter (Selector s)       = runEffectFn2 filterFn s
+-- filter (Predicate p)      = runEffectFn2 filterFnP p
 
-order :: ∀ d eff.                                  Selection d -> Eff (d3::D3|eff) (Selection d)
-order                     = runEffFn1 orderFn
+order :: ∀ d eff.                                  Selection d -> Effect (Selection d)
+order                     = runEffectFn1 orderFn
 
-enter :: ∀ d eff.                                  Selection d -> Eff (d3::D3|eff) (Selection d)
-enter                     = runEffFn1 enterFn
+enter :: ∀ d eff.                                  Selection d -> Effect (Selection d)
+enter                     = runEffectFn1 enterFn
 
-merge :: ∀ d eff.    Selection d                -> Selection d -> Eff (d3::D3|eff) (Selection d)
-merge                     = runEffFn2 mergeFn
+merge :: ∀ d eff.    Selection d                -> Selection d -> Effect (Selection d)
+merge                     = runEffectFn2 mergeFn
 
-transition :: ∀ d eff.    Selection d                -> Selection d -> Eff (d3::D3|eff) (Selection d)
-transition                     = runEffFn2 transitionFn
+transition :: ∀ d eff.    Selection d                -> Selection d -> Effect (Selection d)
+transition                     = runEffectFn2 transitionFn
 
-empty :: ∀ d eff.                                   Selection d -> Eff (d3::D3|eff) Boolean
-empty                     = runEffFn1 emptyFn
+empty :: ∀ d eff.                                   Selection d -> Effect Boolean
+empty                     = runEffectFn1 emptyFn
 
-node :: ∀ d eff.                                   Selection d -> Eff (d3::D3|eff) (Maybe D3Element)
-node s                    = toMaybe <$> runEffFn1 nodeFn s
+node :: ∀ d eff.                                   Selection d -> Effect (Maybe D3Element)
+node s                    = toMaybe <$> runEffectFn1 nodeFn s
 
-nodes :: ∀ d eff.                                  Selection d -> Eff (d3::D3|eff) (Array D3Element)
-nodes                     = runEffFn1 nodesFn
+nodes :: ∀ d eff.                                  Selection d -> Effect (Array D3Element)
+nodes                     = runEffectFn1 nodesFn
 
-exit :: ∀ d eff.                                   Selection d -> Eff (d3::D3|eff) (Selection d)
-exit                      = runEffFn1 exitFn
+exit :: ∀ d eff.                                   Selection d -> Effect (Selection d)
+exit                      = runEffectFn1 exitFn
 
-remove :: ∀ d eff.                                 Selection d -> Eff (d3::D3|eff) (Selection d)  -- maybe this should be Void? TODO
-remove                    = runEffFn1 removeFn
+remove :: ∀ d eff.                                 Selection d -> Effect (Selection d)  -- maybe this should be Void? TODO
+remove                    = runEffectFn1 removeFn
 
-size :: ∀ d eff.                                   Selection d -> Eff (d3::D3|eff) Int
-size                      = runEffFn1 sizeFn
+size :: ∀ d eff.                                   Selection d -> Effect Int
+size                      = runEffectFn1 sizeFn
 
-insert  :: ∀ d eff.  String                     -> Selection d -> Eff (d3::D3|eff) (Selection d)
-insert tag                = runEffFn2 insertFn tag
+insert  :: ∀ d eff.  String                     -> Selection d -> Effect (Selection d)
+insert tag                = runEffectFn2 insertFn tag
 
-append  :: ∀ d eff.  String                     -> Selection d -> Eff (d3::D3|eff) (Selection d)
-append tag                = runEffFn2 appendFn tag
+append  :: ∀ d eff.  String                     -> Selection d -> Effect (Selection d)
+append tag                = runEffectFn2 appendFn tag
 
 -- using the slightly clunkier syntax of fn(selection, p1, p2) to mirror d3 syntax
 call   :: ∀ x eff.
-              (Selection x -> Eff (d3::D3|eff)(Selection x))
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+              (Selection x -> Effect(Selection x))
+            -> Selection x -> Effect (Selection x)
 call fn s =  fn s
 
 call1   :: ∀ x a eff.
-            (Selection x -> a -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> Effect(Selection x))
             -> a
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call1 fn a s =  fn s a
 
 call2   :: ∀ x a b eff.
-            (Selection x -> a -> b -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> Effect(Selection x))
             -> a -> b
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call2 fn a b s =  fn s a b
 
 call3   :: ∀ x a b c eff.
-            (Selection x -> a -> b -> c -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> Effect(Selection x))
             -> a -> b -> c
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call3 fn a b c s =  fn s a b c
 
 call4   :: ∀ x a b c d eff.
-            (Selection x -> a -> b -> c -> d -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> d -> Effect(Selection x))
             -> a -> b -> c -> d
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call4 fn a b c d s =  fn s a b c d
 
 call5   :: ∀ x a b c d e eff.
-            (Selection x -> a -> b -> c -> d -> e -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> d -> e -> Effect(Selection x))
             -> a -> b -> c -> d -> e
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call5 fn a b c d e s =  fn s a b c d e
 
 call6   :: ∀ x a b c d e f eff.
-            (Selection x -> a -> b -> c -> d -> e -> f -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> d -> e -> f -> Effect(Selection x))
             -> a -> b -> c -> d -> e -> f
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call6 fn a b c d e f s =  fn s a b c d e f
 
 call7   :: ∀ x a b c d e f g eff.
-            (Selection x -> a -> b -> c -> d -> e -> f -> g -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> d -> e -> f -> g -> Effect(Selection x))
             -> a -> b -> c -> d -> e -> f -> g
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call7 fn a b c d e f g s =  fn s a b c d e f g
 
 call8   :: ∀ x a b c d e f g h eff.
-            (Selection x -> a -> b -> c -> d -> e -> f -> g -> h -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> d -> e -> f -> g -> h -> Effect(Selection x))
             -> a -> b -> c -> d -> e -> f -> g -> h
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call8 fn a b c d e f g h s =  fn s a b c d e f g h
 
 call9   :: ∀ x a b c d e f g h i eff.
-            (Selection x -> a -> b -> c -> d -> e -> f -> g -> h -> i -> Eff (d3::D3|eff)(Selection x))
+            (Selection x -> a -> b -> c -> d -> e -> f -> g -> h -> i -> Effect(Selection x))
             -> a -> b -> c -> d -> e -> f -> g -> h -> i
-            -> Selection x -> Eff (d3::D3|eff) (Selection x)
+            -> Selection x -> Effect (Selection x)
 call9 fn a b c d e f g h i s =  fn s a b c d e f g h i
 
 -- || Callback stuff
--- first up from Graphics.D3.EffFnExtra
+-- first up from Graphics.D3.EffectFnExtra
 type PropertyName = String
 type CallbackParam d =
     { datum     :: d
@@ -270,33 +270,33 @@ foreign import      mkCallbackWithProp :: ∀ eff d p r. (CallbackParamP d p -> 
   -> D3EffCallbackP eff (CallbackParamP d p) PropertyName r
 
 foreign import onFn :: ∀ eff a d.
-    EffFn3 (d3::D3|eff)
-      (Selection a)               -- 1st argument for EffFn3, the selection itself
-      EventType                   -- 2nd argument for EffFn3, the type of the event being bound
-      (D3EffCallback (d3::D3|eff) -- 3rd argument for EffFn3, this is the callback function
+    EffectFn3
+      (Selection a)               -- 1st argument for EffectFn3, the selection itself
+      EventType                   -- 2nd argument for EffectFn3, the type of the event being bound
+      (D3EffCallback (d3::D3|eff) -- 3rd argument for EffectFn3, this is the callback function
         (CallbackParam d)           -- arg for callback mkCallback
         Unit)                       -- result of mkCallback
-      (Selection a)               -- result of EffFn3, returns selection for "fluid interface" / monadic chain
+      (Selection a)               -- result of EffectFn3, returns selection for "fluid interface" / monadic chain
 
 foreign import onFnWithProperty :: ∀ eff a d p.
-  EffFn5 (d3::D3|eff)
-        (Selection a)               -- 1st argument for EffFn5, the selection itself
-        EventType                   -- 2nd argument for EffFn5, the type of the event being bound
-        (D3EffCallbackP (d3::D3|eff)-- 3rd argument for EffFn5, this is the callback function
+  EffectFn5 (d3::D3|eff)
+        (Selection a)               -- 1st argument for EffectFn5, the selection itself
+        EventType                   -- 2nd argument for EffectFn5, the type of the event being bound
+        (D3EffCallbackP (d3::D3|eff)-- 3rd argument for EffectFn5, this is the callback function
             (CallbackParamP d p)      -- arg 1 for callback mkCallbackWithProp,
             PropertyName              -- arg 2 for callback mkCallbackWithProp
             Unit)                     --  result of mkCallbackWithProp
-        PropertyName                -- 4th argument for EffFn5, name of a property to cache something in
-        p                           -- 5th argument for EffFn5, something to cache in the property field
-        (Selection a)               -- result of EffFn5, returns selection for "fluid interface" / monadic chain
+        PropertyName                -- 4th argument for EffectFn5, name of a property to cache something in
+        p                           -- 5th argument for EffectFn5, something to cache in the property field
+        (Selection a)               -- result of EffectFn5, returns selection for "fluid interface" / monadic chain
 
 -- generic "on" function works for any DOM event
 on :: ∀ a d eff. EventType
-                -> (CallbackParam d -> Eff (d3::D3|eff) Unit)
-                -> (Selection a) -> Eff (d3::D3|eff) (Selection a)
-on event callback selection  = runEffFn3 onFn selection event (mkCallback callback)
+                -> (CallbackParam d -> Effect Unit)
+                -> (Selection a) -> Effect (Selection a)
+on event callback selection  = runEffectFn3 onFn selection event (mkCallback callback)
 
 on' :: ∀ a d p eff. EventType -> PropertyName -> p
-                -> (CallbackParamP d p -> Eff (d3::D3|eff) Unit)
-                -> (Selection a) -> Eff (d3::D3|eff) (Selection a)
-on' evType propName prop callback sel = runEffFn5 onFnWithProperty sel evType (mkCallbackWithProp callback propName) propName prop
+                -> (CallbackParamP d p -> Effect Unit)
+                -> (Selection a) -> Effect (Selection a)
+on' evType propName prop callback sel = runEffectFn5 onFnWithProperty sel evType (mkCallbackWithProp callback propName) propName prop

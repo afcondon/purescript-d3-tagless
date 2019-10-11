@@ -3,7 +3,7 @@ module D3.ForceSimulation where
 -- import Data.Pair
 import D3.Base (Index, D3, Eff)
 import D3.Selection (Selection)
-import Control.Monad.Eff.Uncurried (EffFn2, EffFn1, EffFn3, runEffFn1, runEffFn2, runEffFn3)
+import Effect.Uncurried (EffectFn2, EffectFn1, EffectFn3, runEffectFn1, runEffectFn2, runEffectFn3)
 import Data.Function.Uncurried (mkFn2, Fn2)
 import Data.Maybe (Maybe(Nothing, Just))
 import Prelude (Unit)
@@ -27,70 +27,70 @@ type DraggableLayout = { nodes :: Array ForceNode
 data ForceType      = Centering | Collision | Links | ManyBody | ForceX | ForceY
 data SimulationType = Force
 
-foreign import addForceFn          :: ∀ eff. EffFn3 (d3::D3|eff) String D3Force D3Simulation    D3Simulation
+foreign import addForceFn          :: ∀ eff. EffectFn3 String D3Force D3Simulation    D3Simulation
 foreign import d3ForceSimulationFn :: ∀ eff. Eff    (d3::D3|eff)                                D3Simulation
-foreign import linkIDFn            :: ∀ v eff. EffFn2 (d3::D3|eff) (Fn2 Node Index v) D3Force      D3Force
+foreign import linkIDFn            :: ∀ v eff. EffectFn2 (Fn2 Node Index v) D3Force      D3Force
 foreign import makeCenterForceFn   :: ∀ eff. Eff    (d3::D3|eff)                                     D3Force
-foreign import makeCenterForceFnP  :: ∀ eff. EffFn1 (d3::D3|eff) (Array Number)                      D3Force
-foreign import makeLinkForceFn     :: ∀ eff. EffFn1 (d3::D3|eff) (Array Link)                        D3Force
+foreign import makeCenterForceFnP  :: ∀ eff. EffectFn1 (Array Number)                      D3Force
+foreign import makeLinkForceFn     :: ∀ eff. EffectFn1 (Array Link)                        D3Force
 foreign import makeManyBodyForceFn :: ∀ eff. Eff    (d3::D3|eff)                                     D3Force
-foreign import getLinksFn          :: ∀ eff. EffFn1 (d3::D3|eff) D3Simulation                   (Array Link)
-foreign import setLinksFn          :: ∀ eff. EffFn2 (d3::D3|eff) (Array Link) D3Force                D3Force
-foreign import getForceFn          :: ∀ eff. EffFn2 (d3::D3|eff) String       D3Simulation           D3Force
-foreign import simulationNodesFn   :: ∀ eff. EffFn2 (d3::D3|eff) (Array Node) D3Simulation      D3Simulation
-foreign import onTickFn            :: ∀ eff. EffFn2 (d3::D3|eff)
-                                                    (Eff (d3::D3|eff) Unit)
+foreign import getLinksFn          :: ∀ eff. EffectFn1 D3Simulation                   (Array Link)
+foreign import setLinksFn          :: ∀ eff. EffectFn2 (Array Link) D3Force                D3Force
+foreign import getForceFn          :: ∀ eff. EffectFn2 String       D3Simulation           D3Force
+foreign import simulationNodesFn   :: ∀ eff. EffectFn2 (Array Node) D3Simulation      D3Simulation
+foreign import onTickFn            :: ∀ eff. EffectFn2
+                                                    (Effect Unit)
                                                     D3Simulation
                                                     D3Simulation
-foreign import defaultTickFn       :: ∀ eff. EffFn2 (d3::D3|eff) (Selection Node) (Selection Link)      Unit
+foreign import defaultTickFn       :: ∀ eff. EffectFn2 (Selection Node) (Selection Link)      Unit
 
-defaultTick :: ∀ eff. Selection Node -> Selection Link -> Eff (d3::D3|eff) Unit
-defaultTick = runEffFn2 defaultTickFn
+defaultTick :: ∀ eff. Selection Node -> Selection Link -> Effect Unit
+defaultTick = runEffectFn2 defaultTickFn
 
-d3ForceSimulation :: ∀ eff. SimulationType -> Eff (d3::D3|eff) D3Simulation
+d3ForceSimulation :: ∀ eff. SimulationType -> Effect D3Simulation
 d3ForceSimulation Force = d3ForceSimulationFn
 
-initNodes :: ∀ eff. Array Node -> D3Simulation -> Eff (d3::D3|eff) D3Simulation
-initNodes = runEffFn2 simulationNodesFn
+initNodes :: ∀ eff. Array Node -> D3Simulation -> Effect D3Simulation
+initNodes = runEffectFn2 simulationNodesFn
 
-onTick  :: forall eff. Eff (d3::D3|eff) Unit -> D3Simulation -> Eff (d3::D3|eff) D3Simulation
-onTick = runEffFn2 onTickFn
+onTick  :: forall eff. Effect Unit -> D3Simulation -> Effect D3Simulation
+onTick = runEffectFn2 onTickFn
 
-addForce :: ∀ eff. ForceType -> String -> D3Force -> D3Simulation -> Eff (d3::D3|eff) D3Simulation
-addForce Centering = runEffFn3 addForceFn
-addForce Collision = runEffFn3 addForceFn -- "not implemented yet"
-addForce Links     = runEffFn3 addForceFn
-addForce ManyBody  = runEffFn3 addForceFn
-addForce ForceX    = runEffFn3 addForceFn -- "not implemented yet"
-addForce ForceY    = runEffFn3 addForceFn -- "not implemented yet"
+addForce :: ∀ eff. ForceType -> String -> D3Force -> D3Simulation -> Effect D3Simulation
+addForce Centering = runEffectFn3 addForceFn
+addForce Collision = runEffectFn3 addForceFn -- "not implemented yet"
+addForce Links     = runEffectFn3 addForceFn
+addForce ManyBody  = runEffectFn3 addForceFn
+addForce ForceX    = runEffectFn3 addForceFn -- "not implemented yet"
+addForce ForceY    = runEffectFn3 addForceFn -- "not implemented yet"
 
 -- This function will blow up if String doens't look up a valid force on this simulation TODO
-getForce :: ∀ eff. String -> D3Simulation                         -> Eff (d3::D3|eff) D3Force
-getForce name sim = runEffFn2 getForceFn name sim
+getForce :: ∀ eff. String -> D3Simulation                         -> Effect D3Force
+getForce name sim = runEffectFn2 getForceFn name sim
 
 -- || functions only for LINK force
-makeLinkForce :: ∀ eff. Maybe (Array Link) -> Eff (d3::D3|eff) D3Force
-makeLinkForce (Just ls) = runEffFn1 makeLinkForceFn   ls
-makeLinkForce Nothing   = runEffFn1 makeLinkForceFn   []
+makeLinkForce :: ∀ eff. Maybe (Array Link) -> Effect D3Force
+makeLinkForce (Just ls) = runEffectFn1 makeLinkForceFn   ls
+makeLinkForce Nothing   = runEffectFn1 makeLinkForceFn   []
 
-setIDFunction :: ∀ v eff. (Node -> Index -> v) -> D3Force -> Eff (d3::D3|eff) D3Force -- Force HAS TO BE LINK FORCE HERE
-setIDFunction f = runEffFn2 linkIDFn (mkFn2 f)
+setIDFunction :: ∀ v eff. (Node -> Index -> v) -> D3Force -> Effect D3Force -- Force HAS TO BE LINK FORCE HERE
+setIDFunction f = runEffectFn2 linkIDFn (mkFn2 f)
 
-setLinks      :: ∀ eff. (Array Link) -> D3Force -> Eff (d3::D3|eff) D3Force
-setLinks      = runEffFn2 setLinksFn
+setLinks      :: ∀ eff. (Array Link) -> D3Force -> Effect D3Force
+setLinks      = runEffectFn2 setLinksFn
 
-getLinks      :: ∀ eff. D3Simulation            -> Eff (d3::D3|eff) (Array Link)
-getLinks      = runEffFn1 getLinksFn
+getLinks      :: ∀ eff. D3Simulation            -> Effect (Array Link)
+getLinks      = runEffectFn1 getLinksFn
 
 -- || functions only for MANY BODY force
-makeManyBody :: ∀ eff. Eff (d3::D3|eff) D3Force
+makeManyBody :: ∀ eff. Effect D3Force
 makeManyBody = makeManyBodyForceFn
 
 -- || functions only for CENTERING force was using Data.Pair to be a little more
 -- precise but dropped this to get it to compile with psc-package which doesn't
 -- yet have that
-makeCenterForce :: ∀ eff. Maybe (Array Number) -> Eff (d3::D3|eff) D3Force
-makeCenterForce (Just xy) = runEffFn1 makeCenterForceFnP xy
+makeCenterForce :: ∀ eff. Maybe (Array Number) -> Effect D3Force
+makeCenterForce (Just xy) = runEffectFn1 makeCenterForceFnP xy
 makeCenterForce Nothing   = makeCenterForceFn
 
 {-

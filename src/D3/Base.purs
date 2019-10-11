@@ -1,7 +1,5 @@
 module D3.Base
-  ( module Control.Monad.Eff
-  , D3
-  , D3Element
+  ( D3Element
   , D3Selection
   , Peers
   , DomElement
@@ -17,7 +15,7 @@ module D3.Base
   , opaque
   ) where
 
-import Control.Monad.Eff (Eff, kind Effect)
+import Effect
 import Data.Array ((:))
 import Data.Foldable (foldr, intercalate)
 import Data.Maybe (Maybe(Nothing, Just))
@@ -25,7 +23,6 @@ import Data.Newtype (class Newtype)
 import Prelude (class Show, show, ($), (<>))
 
 -- || FFI for D3
-foreign import data D3 :: Effect
 foreign import data D3Element :: Type
 -- the underlying D3 selection that is passed between calls
 foreign import data D3Selection :: Type
@@ -37,8 +34,6 @@ foreign import data DomElement  :: Type
 newtype Hierarchy d = Hierarchy { name :: String, children :: Array (Hierarchy d), datum :: d }
 
 derive instance newtypeHierarchy :: Newtype (Hierarchy d) _
-
-type D3Eff a = ∀ e. Eff (d3 :: D3 | e) a
 
 type Index       = Number
 type D3Typenames = String

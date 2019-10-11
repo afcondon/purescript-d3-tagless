@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "bower install && pulp build",
+    "documentation": "cd example && pulp build -O -m Main -t html/test.js",
+    "test": "pulp test"
+  },
+  "devDependencies": {
+    "pulp": "^12.2.0",
+    "purescript-psa": "^0.6.0"
+  }
+}
