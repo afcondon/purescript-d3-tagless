@@ -6,3 +6,4 @@
 /.psa*
 .DS_Store
 app.js
+/.spago

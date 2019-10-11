@@ -10,10 +10,10 @@ import Prelude (Unit, show)
 
 foreign import data Drag :: Type -> Type
 
-foreign import d3DragFn :: ∀ d eff. Effect (Drag d)
+foreign import d3DragFn :: ∀ d. Effect (Drag d)
 
 -- When a drag event listener is invoked, d3.event is set to the current drag event.
-foreign import d3DragEvent :: ∀ d eff. Unit -> Effect (DragEvent d)
+foreign import d3DragEvent :: ∀ d. Unit -> Effect (DragEvent d)
 
 type DragEvent d = {
     target      :: Drag d
@@ -30,10 +30,10 @@ type DragEvent d = {
 
 type Draggable r = { x :: Number, y :: Number | r }  -- minimum requirement for draggable object
 
-type DragListener d = ∀ eff. (d -> Number -> Array D3Element -> D3Element -> Effect Unit)
+type DragListener d = (d -> Number -> Array D3Element -> D3Element -> Effect Unit)
 
 -- create a new Drag behaviour Object/Function thingy
-d3Drag :: ∀ d eff.  d -> Effect (Drag d)
+d3Drag :: ∀ d.  d -> Effect (Drag d)
 d3Drag d = d3DragFn
 
 -- || Going to try for a slightly richer, more PureScript-y API here just
@@ -44,45 +44,45 @@ d3Drag d = d3DragFn
 -- || i'd like to come back to this once drag and zoom are working and see whether
 -- || it makes sense to wrap dispatch itself TODO
 
-foreign import findCallbackFn    :: ∀ d eff. EffectFn2 D3Typenames  (Drag d)      (Nullable (DragListener d))
-foreign import removeListenersFn :: ∀ d eff. EffectFn2 D3Typenames  (Drag d)      (Drag d)
--- foreign import applyDragFn       :: ∀ d eff. EffectFn2 (Drag d)     (Selection d) (Selection d)
-foreign import dragUpdateFn      :: ∀ d eff. EffectFn2 d            D3Element      Unit
+foreign import findCallbackFn    :: ∀ d. EffectFn2 D3Typenames (Drag d) (Nullable (DragListener d))
+foreign import removeListenersFn :: ∀ d. EffectFn2 D3Typenames (Drag d) (Drag d)
+-- foreign import applyDragFn       :: ∀ d. EffectFn2 (Drag d) (Selection d) (Selection d)
+foreign import dragUpdateFn      :: ∀ d. EffectFn2 d D3Element Unit
 
 
-foreign import addListenerFn     :: ∀ d eff. EffectFn3 D3Typenames
-                                                                (EffectFn3PlusThis (d3::D3|eff) d Number (Array D3Element) Unit)
-                                                                (Drag d)
-                                                                (Drag d)
+foreign import addListenerFn     :: ∀ d. EffectFn3 D3Typenames
+                                                      (EffectFn3PlusThis d Number (Array D3Element) Unit)
+                                                      (Drag d)
+                                                      (Drag d)
 
 foreign import data EffectFn3PlusThis :: # Effect -> Type -> Type -> Type -> Type -> Type    -- JS call with three params
-foreign import mkEffectFn4Special :: forall eff d r.
-                                        (d -> Index -> Array D3Element -> D3Element -> Eff eff r) -- callback has 4 params
+foreign import mkEffectFn4Special :: forall d r.
+                                        (d -> Index -> Array D3Element -> D3Element -> Effect r) -- callback has 4 params
                                         -> EffectFn3PlusThis eff d Index (Array D3Element) Unit      -- JS calls with 3 params + this
 
 -- lookup and remove differ in JS as listeners-not-given => lookup, listeners-as-null => remove
-lookupDrag      :: ∀ d eff. Typenames                     -> Drag d -> Effect (Nullable (DragListener d))
+lookupDrag      :: ∀ d. Typenames -> Drag d -> Effect (Nullable (DragListener d))
 lookupDrag tn = runEffectFn2 findCallbackFn (show tn)
 
-removeDragListeners :: ∀ d eff. Typenames                       -> Drag d -> Effect (Drag d)
+removeDragListeners :: ∀ d. Typenames -> Drag d -> Effect (Drag d)
 removeDragListeners tn = runEffectFn2 removeListenersFn (show tn)
 
-addDragListener     :: ∀ d eff. Typenames -> DragListener d   -> Drag d -> Effect (Drag d)
+addDragListener     :: ∀ d. Typenames -> DragListener d   -> Drag d -> Effect (Drag d)
 -- callback has 4 params but D3 will be calling it with 3 params and hiding the 4th in the `this` pointer
 addDragListener tn callback = runEffectFn3 addListenerFn (show tn) (mkEffectFn4Special callback)
 
 -- applyDrag - not used in current commit, this was an attempt to avoid the unsafeCoerce on the drag - TODO
--- applyDrag       :: ∀ d eff. (Drag d) -> (Selection d) -> Effect (Selection d)
--- applyDrag      = runEffectFn2 applyDragFn
+-- applyDrag :: ∀ d. (Drag d) -> (Selection d) -> Effect (Selection d)
+-- applyDrag = runEffectFn2 applyDragFn
 
 -- slightly suspect side-effecting function to update the dragged object Both
 -- the DOM element and the data element need to change but the D3 way of doing
 -- this is to set the data element's fields while changing the `attr` of the DOM
 -- element and that's what this function wraps
-dragUpdate :: ∀ d eff. d -> D3Element -> Effect Unit
+dragUpdate :: ∀ d. d -> D3Element -> Effect Unit
 dragUpdate = runEffectFn2 dragUpdateFn
 
--- on :: ∀ d eff. (d -> Effect(unit)) -> Drag d -> Effect Drag
+-- on :: ∀ d. (d -> Effect(unit)) -> Drag d -> Effect Drag
 -- on dragFn
 
 {-
@@ -118,7 +118,7 @@ dragUpdate = runEffectFn2 dragUpdateFn
 
   -}
 
-type AccessorFn d = ∀ eff. (d -> Effect Unit)
+type AccessorFn d = d -> Effect Unit
 
 foreign import data Subject :: Type
 
@@ -133,7 +133,7 @@ foreign import data Subject :: Type
 -}
 
 -- if subject specified sets the subject accessor to the specified object or function and returns the drag behavior.
--- subject :: ∀ d eff. SubjectOpts d ->
+-- subject :: ∀ d. SubjectOpts d ->
 
 -- If subject is not specified, returns the current subject accessor, which defaults to:
 {-

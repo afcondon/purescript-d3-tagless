@@ -16,6 +16,7 @@ You can edit this file as you like.
     , "transformers"
     , "web-events"
     , "web-html"
+    , "web-touchevents"
     , "colors"
     ]
 , packages =
