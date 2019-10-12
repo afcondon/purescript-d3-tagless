@@ -262,8 +262,8 @@ type CallbackParamP d p =
     , alt       :: Boolean
   }
 
-foreign import data D3EffCallback      :: # Effect -> Type -> Type -> Type
-foreign import data D3EffCallbackP     :: # Effect -> Type -> Type -> Type -> Type
+foreign import data D3EffCallback      :: Type -> Type -> Type
+foreign import data D3EffCallbackP     :: Type -> Type -> Type -> Type
 foreign import mkCallback :: ∀ d r. (CallbackParam d -> Effect r) -> D3EffCallback (CallbackParam d) r
 foreign import mkCallbackWithProp :: ∀ d p r. (CallbackParamP d p -> Effect r) -> PropertyName -> D3EffCallbackP (CallbackParamP d p) PropertyName r
 

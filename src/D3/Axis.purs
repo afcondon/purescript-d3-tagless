@@ -10,40 +10,40 @@ module D3.Axis
   , renderAxis
     )where
 
-import D3.Base (D3, Eff)
 import D3.Scale (Scale)
 import D3.Selection (Selection)
-import Effect.Uncurried (runEffectFn2, EffectFn3, runEffectFn3, EffectFn2, runEffectFn1, EffectFn1)
 import Data.Maybe (Maybe(Just, Nothing))
+import Effect (Effect)
+import Effect.Uncurried (runEffectFn2, EffectFn3, runEffectFn3, EffectFn2, runEffectFn1, EffectFn1)
 
 foreign import data Axis :: Type -> Type
 
-foreign import d3AxisTopFn    :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
-foreign import d3AxisBottomFn :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
-foreign import d3AxisRightFn  :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
-foreign import d3AxisLeftFn   :: ∀ d r eff. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisTopFn    :: ∀ d r. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisBottomFn :: ∀ d r. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisRightFn  :: ∀ d r. EffectFn1 (Scale d r) (Axis d)
+foreign import d3AxisLeftFn   :: ∀ d r. EffectFn1 (Scale d r) (Axis d)
 
-d3AxisTop :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisTop :: ∀ d r. Scale d r -> Effect (Axis d)
 d3AxisTop = runEffectFn1 d3AxisTopFn
 
-d3AxisBottom :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisBottom :: ∀ d r. Scale d r -> Effect (Axis d)
 d3AxisBottom = runEffectFn1 d3AxisBottomFn
 
-d3AxisRight :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisRight :: ∀ d r. Scale d r -> Effect (Axis d)
 d3AxisRight = runEffectFn1 d3AxisRightFn
 
-d3AxisLeft :: ∀ d r eff. Scale d r -> Effect (Axis d)
+d3AxisLeft :: ∀ d r. Scale d r -> Effect (Axis d)
 d3AxisLeft = runEffectFn1 d3AxisLeftFn
 
-foreign import d3AxisTicksCountFn     :: ∀ d eff. EffectFn2 Number (Axis d)        (Axis d)
-foreign import d3AxisTicksCountSFn    :: ∀ d eff. EffectFn3 Number String (Axis d) (Axis d)
-foreign import d3AxisTicksIntervalFn  :: ∀ d eff. EffectFn2 Number (Axis d)        (Axis d)
-foreign import d3AxisTicksIntervalSFn :: ∀ d eff. EffectFn3 Number String (Axis d) (Axis d)
+foreign import d3AxisTicksCountFn     :: ∀ d. EffectFn2 Number (Axis d)        (Axis d)
+foreign import d3AxisTicksCountSFn    :: ∀ d. EffectFn3 Number String (Axis d) (Axis d)
+foreign import d3AxisTicksIntervalFn  :: ∀ d. EffectFn2 Number (Axis d)        (Axis d)
+foreign import d3AxisTicksIntervalSFn :: ∀ d. EffectFn3 Number String (Axis d) (Axis d)
 
 data TickParams = Count Number (Maybe String)
                  | Interval Number (Maybe String)  -- there are more possibilities here to write TODO
 
-axisTicks :: ∀ d eff. TickParams -> Axis d -> Effect (Axis d)
+axisTicks :: ∀ d. TickParams -> Axis d -> Effect (Axis d)
 axisTicks (Count n Nothing)     = runEffectFn2 d3AxisTicksCountFn n
 axisTicks (Count n (Just s))    = runEffectFn3 d3AxisTicksCountSFn n s
 axisTicks (Interval i Nothing)  = runEffectFn2 d3AxisTicksIntervalFn i
@@ -53,9 +53,9 @@ axisTicks (Interval i (Just s)) = runEffectFn3 d3AxisTicksIntervalSFn i s
 -- | pretty sure this is unnecessary - didn't i implement all those selection
 -- call functions for a reason? however, just want to get this axis working
 -- right now and revisit TODO
-foreign import renderAxisFn :: ∀ d a eff. EffectFn2 (Axis a) (Selection d) (Selection d)
+foreign import renderAxisFn :: ∀ d a. EffectFn2 (Axis a) (Selection d) (Selection d)
 
-renderAxis :: ∀ a d eff. Axis a -> Selection d -> Effect (Selection d)
+renderAxis :: ∀ a d. Axis a -> Selection d -> Effect (Selection d)
 renderAxis = runEffectFn2 renderAxisFn
 
 -- # axis.ticks(arguments…) <>

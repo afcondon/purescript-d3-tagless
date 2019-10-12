@@ -51,14 +51,14 @@ foreign import dragUpdateFn      :: ∀ d. EffectFn2 d D3Element Unit
 
 
 foreign import addListenerFn     :: ∀ d. EffectFn3 D3Typenames
-                                                      (EffectFn3PlusThis d Number (Array D3Element) Unit)
-                                                      (Drag d)
-                                                      (Drag d)
+                                        (EffectFn3PlusThis d Number (Array D3Element) Unit)
+                                        (Drag d)
+                                        (Drag d)
 
-foreign import data EffectFn3PlusThis :: # Effect -> Type -> Type -> Type -> Type -> Type    -- JS call with three params
+foreign import data EffectFn3PlusThis :: Type -> Type -> Type -> Type -> Type    -- JS call with three params
 foreign import mkEffectFn4Special :: forall d r.
                                         (d -> Index -> Array D3Element -> D3Element -> Effect r) -- callback has 4 params
-                                        -> EffectFn3PlusThis eff d Index (Array D3Element) Unit      -- JS calls with 3 params + this
+                                        -> EffectFn3PlusThis d Index (Array D3Element) Unit      -- JS calls with 3 params + this
 
 -- lookup and remove differ in JS as listeners-not-given => lookup, listeners-as-null => remove
 lookupDrag      :: ∀ d. Typenames -> Drag d -> Effect (Nullable (DragListener d))
